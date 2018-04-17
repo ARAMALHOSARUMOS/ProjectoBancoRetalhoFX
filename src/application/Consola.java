@@ -1,10 +1,14 @@
 package application;
 
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -20,7 +24,11 @@ import com.rumos.bancoretalho.exceptions.ContaException;
 import com.rumos.bancoretalho.exceptions.EmailException;
 import com.rumos.bancoretalho.exceptions.MoradaException;
 import com.rumos.bancoretalho.exceptions.TelefoneException;
-import com.rumos.bancoretalho.impl.*;
+import com.rumos.bancoretalho.impl.Agencia;
+import com.rumos.bancoretalho.impl.Banco;
+import com.rumos.bancoretalho.impl.Cartao;
+import com.rumos.bancoretalho.impl.Cliente;
+import com.rumos.bancoretalho.impl.Conta;
 
 public class Consola extends Application {
 	@Override
@@ -62,8 +70,18 @@ public class Consola extends Application {
 			});
 
 			Button btnListarClientes = new Button();
-			btnListarClientes.setText("Opcoes Cliente");
+			btnListarClientes.setText("Listar Clientes");
 			btnListarClientes.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+					listarClientes(primaryStage);
+				}
+			});
+			
+			Button btnopcoesCliente = new Button();
+			btnopcoesCliente.setText("Opções Cliente");
+			btnopcoesCliente.setOnAction(new EventHandler<ActionEvent>() {
 
 				@Override
 				public void handle(ActionEvent event) {
@@ -79,6 +97,7 @@ public class Consola extends Application {
 			grid.add(btnListarAgencias, 1, 1);
 			grid.add(btnCriarCliente, 1, 2);
 			grid.add(btnListarClientes, 1, 3);
+			grid.add(btnopcoesCliente, 1, 4);
 
 			StackPane root = new StackPane();
 			root.getChildren().add(grid);
@@ -111,6 +130,17 @@ public class Consola extends Application {
 
 			Label label2 = new Label("NIF : ");
 			TextField nifField = new TextField();
+			nifField.textProperty().addListener(
+					new ChangeListener<String>() {
+						@Override
+						public void changed(
+								ObservableValue<? extends String> observable,
+								String oldValue, String newValue) {
+							if (!newValue.matches("\\d{0,9}?")) {
+								nifField.setText(oldValue);
+							}
+						}
+					});
 			HBox hb1 = new HBox();
 			hb1.getChildren().addAll(label2, nifField);
 			hb1.setSpacing(10);
@@ -283,6 +313,17 @@ public class Consola extends Application {
 
 			Label labelAgencia = new Label("Codigo agencia : ");
 			TextField agenciaField = new TextField();
+			agenciaField.textProperty().addListener(
+					new ChangeListener<String>() {
+						@Override
+						public void changed(
+								ObservableValue<? extends String> observable,
+								String oldValue, String newValue) {
+							if (!newValue.matches("\\d{0,9}?")) {
+								agenciaField.setText(oldValue);
+							}
+						}
+					});
 			HBox hbAgencia = new HBox();
 			hbAgencia.getChildren().addAll(labelAgencia, agenciaField);
 			hbAgencia.setSpacing(10);
@@ -337,6 +378,17 @@ public class Consola extends Application {
 
 			Label labelTelefone = new Label("Telefone : ");
 			TextField telefoneField = new TextField();
+			telefoneField.textProperty().addListener(
+					new ChangeListener<String>() {
+						@Override
+						public void changed(
+								ObservableValue<? extends String> observable,
+								String oldValue, String newValue) {
+							if (!newValue.matches("\\d{0,9}?")) {
+								telefoneField.setText(oldValue);
+							}
+						}
+					});
 			HBox hbTelefone = new HBox();
 			hbTelefone.getChildren().addAll(labelTelefone, telefoneField);
 			hbTelefone.setSpacing(10);
@@ -356,7 +408,7 @@ public class Consola extends Application {
 
 					Agencia agencia = DatabaseOperations
 							.retrieveAgenciaById(Integer.parseInt(agenciaField
-									.getText()));
+									.getText()), true);
 
 					if (agencia.getNumero() > 0) {
 
@@ -457,6 +509,79 @@ public class Consola extends Application {
 		}
 	}
 
+	public void listarClientes(Stage primaryStage) {
+		try {
+			primaryStage.setTitle("Listar Clientes");
+
+			Label labelCliente = new Label("Código agencia : ");
+			TextField agenciaField = new TextField();
+			agenciaField.textProperty().addListener(
+					new ChangeListener<String>() {
+						@Override
+						public void changed(
+								ObservableValue<? extends String> observable,
+								String oldValue, String newValue) {
+							if (!newValue.matches("\\d{0,9}?")) {
+								agenciaField.setText(oldValue);
+							}
+						}
+					});
+			HBox hbAgencia = new HBox();
+			hbAgencia.getChildren().addAll(labelCliente, agenciaField);
+			hbAgencia.setSpacing(10);
+
+			Button btn = new Button();
+			btn.setText("Listar");
+			btn.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+
+					Cliente[] clientes = DatabaseOperations
+							.retrieveClientesByAgencia(Integer
+									.parseInt(agenciaField.getText()));
+
+					for (int i = 0; i < clientes.length; i++) {
+						System.out.println("Nome Agencia : "
+								+ clientes[i].getNome() + " CC : "
+								+ clientes[i].getNumeroCartaoCidadao()
+								+ " Código : " + clientes[i].getId());
+					}
+
+					agenciaField.setText("");
+
+				}
+			});
+
+			Button btn1 = new Button();
+			btn1.setText("Sair");
+			btn1.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+					start(primaryStage);
+				}
+			});
+
+			GridPane grid = new GridPane();
+			grid.setVgap(2);
+			grid.setHgap(10);
+			grid.setPadding(new Insets(5, 5, 5, 5));
+			grid.add(hbAgencia, 0, 0);
+			grid.add(btn, 0, 1);
+			grid.add(btn1, 0, 2);
+
+			StackPane root = new StackPane();
+			root.getChildren().add(grid);
+			Scene scene = new Scene(root, 400, 400);
+			// scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			primaryStage.setScene(scene);
+			primaryStage.show();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	public void opcoesCliente(Stage primaryStage) {
 		try {
 			// BorderPane root = new BorderPane();
@@ -468,6 +593,40 @@ public class Consola extends Application {
 			HBox hbCliente = new HBox();
 			hbCliente.getChildren().addAll(labelCliente, clienteField);
 			hbCliente.setSpacing(10);
+			
+			Label labelCartao = new Label("Número Cartão : ");
+			TextField cartaoField = new TextField();
+			cartaoField.textProperty().addListener(
+					new ChangeListener<String>() {
+						@Override
+						public void changed(
+								ObservableValue<? extends String> observable,
+								String oldValue, String newValue) {
+							if (!newValue.matches("\\d{0,9}?")) {
+								cartaoField.setText(oldValue);
+							}
+						}
+					});
+			HBox hbCartao= new HBox();
+			hbCartao.getChildren().addAll(labelCartao, cartaoField);
+			hbCartao.setSpacing(10);
+			
+			Label labelValor = new Label("Valor Operação : ");
+			TextField valorField = new TextField();
+			valorField.textProperty().addListener(
+					new ChangeListener<String>() {
+						@Override
+						public void changed(
+								ObservableValue<? extends String> observable,
+								String oldValue, String newValue) {
+							if (!newValue.matches("\\d{0,9}?")) {
+								valorField.setText(oldValue);
+							}
+						}
+					});
+			HBox hbValor= new HBox();
+			hbValor.getChildren().addAll(labelValor, valorField);
+			hbValor.setSpacing(10);
 
 			Button btnDeposito = new Button();
 			btnDeposito.setText("Efetuar Depósito");
@@ -476,19 +635,112 @@ public class Consola extends Application {
 				@Override
 				public void handle(ActionEvent event) {
 
+					Conta contaOrdemCliente = DatabaseOperations.retrieveContaOrdemCliente(Integer.parseInt(clienteField.getText()));
+					Cartao cartaoCliente = DatabaseOperations.retrieveCartaoById(Integer.parseInt(cartaoField.getText()), true);
+					Agencia agenciaCliente = DatabaseOperations.retrieveAgenciaByClienteId(Integer.parseInt(clienteField.getText()), true);
+					
+					Cartao[] cartoesConta = contaOrdemCliente.getCartoes();
+					
+					boolean isTheSame = false;
+					
+					for (int i=0; i < cartoesConta.length; i++){
+						if (cartoesConta[i].getNumero() == cartaoCliente.getNumero()){
+							isTheSame = true;
+							break;
+						}
+					}
+					
+					if (isTheSame){
+						
+						try {
+							agenciaCliente.criarMovimento(contaOrdemCliente, cartaoCliente, "Deposito", Integer.parseInt(valorField.getText()), null);
+							Alert alert = new Alert(AlertType.INFORMATION);
+							alert.setTitle("Aviso");
+							alert.setHeaderText("Deposito efetuado com sucesso!");
+							alert.showAndWait();
+
+							clienteField.setText("");
+							cartaoField.setText("");
+							valorField.setText("");
+							
+						} catch (NumberFormatException | ContaException
+								| CartaoException e) {
+							Alert alert = new Alert(AlertType.ERROR);
+							alert.setTitle("Erro");
+							alert.setHeaderText("Ocorreu um erro ao efetuar o movimento!");
+							alert.showAndWait();
+							e.printStackTrace();
+						}
+						
+					} else {
+						Alert alert = new Alert(AlertType.ERROR);
+						alert.setTitle("Erro");
+						alert.setHeaderText("O Cartão indicado não é da conta do cliente!");
+						alert.showAndWait();
+					}
 				}
 			});
-			
+
 			Button btnLevantamento = new Button();
 			btnLevantamento.setText("Efetuar Levantamento");
 			btnLevantamento.setOnAction(new EventHandler<ActionEvent>() {
 
 				@Override
 				public void handle(ActionEvent event) {
+					
+					Conta contaOrdemCliente = DatabaseOperations.retrieveContaOrdemCliente(Integer.parseInt(clienteField.getText()));
+					Cartao cartaoCliente = DatabaseOperations.retrieveCartaoById(Integer.parseInt(cartaoField.getText()), true);
+					Agencia agenciaCliente = DatabaseOperations.retrieveAgenciaByClienteId(Integer.parseInt(clienteField.getText()), true);
+					
+					Cartao[] cartoesConta = contaOrdemCliente.getCartoes();
+					
+					boolean isTheSame = false;
+					
+					for (int i=0; i < cartoesConta.length; i++){
+						if (cartoesConta[i].getNumero() == cartaoCliente.getNumero()){
+							isTheSame = true;
+							break;
+						}
+					}
+					
+					if (isTheSame){
+						
+						try {
+							agenciaCliente.criarMovimento(contaOrdemCliente, cartaoCliente, "Levantamento", Integer.parseInt(valorField.getText()), null);
+							Alert alert = new Alert(AlertType.INFORMATION);
+							alert.setTitle("Aviso");
+							alert.setHeaderText("Levantamento efetuado com sucesso!");
+							alert.showAndWait();
+
+							clienteField.setText("");
+							cartaoField.setText("");
+							valorField.setText("");
+							
+						} catch (NumberFormatException | 
+								 CartaoException e) {
+							Alert alert = new Alert(AlertType.ERROR);
+							alert.setTitle("Erro");
+							alert.setHeaderText("Ocorreu um erro ao efetuar o levantamento!");
+							alert.showAndWait();
+							e.printStackTrace();
+						} catch (ContaException e1){
+							Alert alert = new Alert(AlertType.ERROR);
+							alert.setTitle("Erro");
+							alert.setHeaderText("O saldo é insuficiente para concretizar o movimento!");
+							alert.showAndWait();
+							e1.printStackTrace();						
+						}
+						
+					} else {
+						Alert alert = new Alert(AlertType.ERROR);
+						alert.setTitle("Erro");
+						alert.setHeaderText("O Cartão indicado não é da conta do cliente!");
+						alert.showAndWait();
+					}
 
 				}
 			});
-			
+
 			Button btnTransferencia = new Button();
 			btnTransferencia.setText("Efetuar Transferência");
 			btnTransferencia.setOnAction(new EventHandler<ActionEvent>() {
@@ -514,10 +766,12 @@ public class Consola extends Application {
 			grid.setHgap(10);
 			grid.setPadding(new Insets(5, 5, 5, 5));
 			grid.add(hbCliente, 10, 0);
-			grid.add(btnDeposito, 10, 1);
-			grid.add(btnLevantamento, 10, 2);
-			grid.add(btnTransferencia, 10, 3);			
-			grid.add(btnSair, 10, 4);
+			grid.add(hbCartao,10,1);
+			grid.add(hbValor, 10, 2);
+			grid.add(btnDeposito, 10, 3);
+			grid.add(btnLevantamento, 10, 4);
+			grid.add(btnTransferencia, 10, 5);
+			grid.add(btnSair, 10, 6);
 
 			StackPane root = new StackPane();
 			root.getChildren().add(grid);
