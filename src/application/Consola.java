@@ -48,6 +48,72 @@ public class Consola extends Application {
 			// BorderPane root = new BorderPane();
 
 			primaryStage.setTitle("Consola Banco Retalho!");
+
+			Button btnopcoesBanco = new Button();
+			btnopcoesBanco.setText("Opções Banco");
+			btnopcoesBanco.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+					opcoesBanco(primaryStage);
+				}
+			});
+
+			Button btnopcoesAgencia = new Button();
+			btnopcoesAgencia.setText("Opções Agencia");
+			btnopcoesAgencia.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+					opcoesAgencia(primaryStage);
+				}
+			});
+
+			Button btnopcoesCliente = new Button();
+			btnopcoesCliente.setText("Opções Cliente");
+			btnopcoesCliente.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+					opcoesCliente(primaryStage);
+				}
+			});
+
+			GridPane grid = new GridPane();
+			grid.setVgap(10);
+			grid.setHgap(150);
+			grid.setPadding(new Insets(5, 5, 5, 5));
+			grid.add(btnopcoesBanco, 1, 0);
+			grid.add(btnopcoesAgencia, 1, 2);
+			grid.add(btnopcoesCliente, 1, 4);
+
+			StackPane root = new StackPane();
+			root.getChildren().add(grid);
+			Scene scene = new Scene(root, 400, 400);
+			// scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			primaryStage.setScene(scene);
+			primaryStage.show();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void opcoesBanco(Stage primaryStage) {
+
+		try {
+			primaryStage.setTitle("Consola Banco Retalho!");
+			
+			Button btnCriarBanco = new Button();
+			btnCriarBanco.setText("Criar Banco");
+			btnCriarBanco.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+					// System.out.println("Hello World!");
+					
+				}
+			});
+			
 			Button btnCriarAgencia = new Button();
 			btnCriarAgencia.setText("Criar Agencia");
 			btnCriarAgencia.setOnAction(new EventHandler<ActionEvent>() {
@@ -69,7 +135,43 @@ public class Consola extends Application {
 					listarAgencias(primaryStage);
 				}
 			});
+			
+			Button btnSair = new Button();
+			btnSair.setText("Sair");
+			btnSair.setOnAction(new EventHandler<ActionEvent>() {
 
+				@Override
+				public void handle(ActionEvent event) {
+					start(primaryStage);
+				}
+			});
+
+
+			GridPane grid = new GridPane();
+			grid.setVgap(10);
+			grid.setHgap(150);
+			grid.setPadding(new Insets(5, 5, 5, 5));
+			grid.add(btnCriarBanco, 1, 0);
+			grid.add(btnCriarAgencia, 1, 2);
+			grid.add(btnListarAgencias, 1, 4);
+			grid.add(btnSair, 1, 6);
+
+			StackPane root = new StackPane();
+			root.getChildren().add(grid);
+			Scene scene = new Scene(root, 400, 400);
+			// scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			primaryStage.setScene(scene);
+			primaryStage.show();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public void opcoesAgencia(Stage primaryStage) {
+		try {
+			primaryStage.setTitle("Consola Banco Retalho!");
+			
 			Button btnCriarCliente = new Button();
 			btnCriarCliente.setText("Criar Cliente");
 			btnCriarCliente.setOnAction(new EventHandler<ActionEvent>() {
@@ -90,25 +192,45 @@ public class Consola extends Application {
 				}
 			});
 
-			Button btnopcoesCliente = new Button();
-			btnopcoesCliente.setText("Opções Cliente");
-			btnopcoesCliente.setOnAction(new EventHandler<ActionEvent>() {
+			Button btnCriarNovaConta = new Button();
+			btnCriarNovaConta.setText("Criar Nova Conta");
+			btnCriarNovaConta.setOnAction(new EventHandler<ActionEvent>() {
 
 				@Override
 				public void handle(ActionEvent event) {
-					opcoesCliente(primaryStage);
+					
+				}
+			});
+			
+			Button btnCriarNovaCartao = new Button();
+			btnCriarNovaCartao.setText("Criar Novo Cartao");
+			btnCriarNovaCartao.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+					
 				}
 			});
 
+			Button btnSair = new Button();
+			btnSair.setText("Sair");
+			btnSair.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+					start(primaryStage);
+				}
+			});
+			
 			GridPane grid = new GridPane();
 			grid.setVgap(10);
 			grid.setHgap(150);
 			grid.setPadding(new Insets(5, 5, 5, 5));
-			grid.add(btnCriarAgencia, 1, 0);
-			grid.add(btnListarAgencias, 1, 1);
-			grid.add(btnCriarCliente, 1, 2);
-			grid.add(btnListarClientes, 1, 3);
-			grid.add(btnopcoesCliente, 1, 4);
+			grid.add(btnCriarCliente, 1, 0);
+			grid.add(btnListarClientes, 1, 2);
+			grid.add(btnCriarNovaConta, 1, 4);
+			grid.add(btnCriarNovaCartao, 1, 6);
+			grid.add(btnSair, 1, 8);
 
 			StackPane root = new StackPane();
 			root.getChildren().add(grid);
@@ -143,7 +265,9 @@ public class Consola extends Application {
 			TextField nifField = new TextField();
 			nifField.textProperty().addListener(new ChangeListener<String>() {
 				@Override
-				public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				public void changed(
+						ObservableValue<? extends String> observable,
+						String oldValue, String newValue) {
 					if (!newValue.matches("\\d{0,9}?")) {
 						nifField.setText(oldValue);
 					}
@@ -184,7 +308,8 @@ public class Consola extends Application {
 				@Override
 				public void handle(ActionEvent event) {
 
-					Banco banco = DatabaseOperations.retrieveBancoByNome(nomeBancoField.getText());
+					Banco banco = DatabaseOperations
+							.retrieveBancoByNome(nomeBancoField.getText());
 
 					if (banco.getId() > 0) {
 
@@ -197,7 +322,8 @@ public class Consola extends Application {
 
 						System.out.println(nomeAgencia + ruaAgencia);
 
-						if (banco.criarAgencia(nomeAgencia, nifAgencia, ruaAgencia, localidadeAgencia,
+						if (banco.criarAgencia(nomeAgencia, nifAgencia,
+								ruaAgencia, localidadeAgencia,
 								codigoPostalAgencia, paisAgencia)) {
 
 							nomeField.setText("");
@@ -218,7 +344,7 @@ public class Consola extends Application {
 
 				@Override
 				public void handle(ActionEvent event) {
-					start(primaryStage);
+					opcoesBanco(primaryStage);
 				}
 			});
 
@@ -267,11 +393,14 @@ public class Consola extends Application {
 				public void handle(ActionEvent event) {
 
 					Agencia[] agencias = DatabaseOperations
-							.retrieveAgenciasByBanco(Integer.parseInt(nomeBancoField.getText()));
+							.retrieveAgenciasByBanco(Integer
+									.parseInt(nomeBancoField.getText()));
 
 					for (int i = 0; i < agencias.length; i++) {
-						System.out.println("Nome Agencia : " + agencias[i].getNome() + " Nif : " + agencias[i].getNif()
-								+ " Código : " + agencias[i].getNumero());
+						System.out.println("Nome Agencia : "
+								+ agencias[i].getNome() + " Nif : "
+								+ agencias[i].getNif() + " Código : "
+								+ agencias[i].getNumero());
 					}
 
 					nomeBancoField.setText("");
@@ -285,7 +414,7 @@ public class Consola extends Application {
 
 				@Override
 				public void handle(ActionEvent event) {
-					start(primaryStage);
+					opcoesBanco(primaryStage);
 				}
 			});
 
@@ -316,14 +445,17 @@ public class Consola extends Application {
 
 			Label labelAgencia = new Label("Codigo agencia : ");
 			TextField agenciaField = new TextField();
-			agenciaField.textProperty().addListener(new ChangeListener<String>() {
-				@Override
-				public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-					if (!newValue.matches("\\d{0,9}?")) {
-						agenciaField.setText(oldValue);
-					}
-				}
-			});
+			agenciaField.textProperty().addListener(
+					new ChangeListener<String>() {
+						@Override
+						public void changed(
+								ObservableValue<? extends String> observable,
+								String oldValue, String newValue) {
+							if (!newValue.matches("\\d{0,9}?")) {
+								agenciaField.setText(oldValue);
+							}
+						}
+					});
 			HBox hbAgencia = new HBox();
 			hbAgencia.getChildren().addAll(labelAgencia, agenciaField);
 			hbAgencia.setSpacing(10);
@@ -378,14 +510,17 @@ public class Consola extends Application {
 
 			Label labelTelefone = new Label("Telefone : ");
 			TextField telefoneField = new TextField();
-			telefoneField.textProperty().addListener(new ChangeListener<String>() {
-				@Override
-				public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-					if (!newValue.matches("\\d{0,9}?")) {
-						telefoneField.setText(oldValue);
-					}
-				}
-			});
+			telefoneField.textProperty().addListener(
+					new ChangeListener<String>() {
+						@Override
+						public void changed(
+								ObservableValue<? extends String> observable,
+								String oldValue, String newValue) {
+							if (!newValue.matches("\\d{0,9}?")) {
+								telefoneField.setText(oldValue);
+							}
+						}
+					});
 			HBox hbTelefone = new HBox();
 			hbTelefone.getChildren().addAll(labelTelefone, telefoneField);
 			hbTelefone.setSpacing(10);
@@ -403,27 +538,31 @@ public class Consola extends Application {
 				@Override
 				public void handle(ActionEvent event) {
 
-					Agencia agencia = DatabaseOperations.retrieveAgenciaById(Integer.parseInt(agenciaField.getText()),
-							true);
+					Agencia agencia = DatabaseOperations.retrieveAgenciaById(
+							Integer.parseInt(agenciaField.getText()), true);
 
 					if (agencia.getNumero() > 0) {
 
 						String tipoCliente = tipoField.getText();
 						String nomeAgencia = nomeField.getText();
-						int numeroCartaoCidadaoAgencia = Integer.parseInt(ccField.getText());
+						int numeroCartaoCidadaoAgencia = Integer
+								.parseInt(ccField.getText());
 						String ruaAgencia = ruaField.getText();
 						String localidadeAgencia = localidadeField.getText();
 						String codigoPostalAgencia = cpField.getText();
 						String paisAgencia = paisField.getText();
 						String profissaoAgencia = profissaoField.getText();
-						int telefoneAgencia = Integer.parseInt(telefoneField.getText());
+						int telefoneAgencia = Integer.parseInt(telefoneField
+								.getText());
 						String emailAgencia = emailField.getText();
 
 						System.out.println(nomeAgencia + ruaAgencia);
 
 						try {
-							agencia.criarCliente(tipoCliente, nomeAgencia, numeroCartaoCidadaoAgencia, ruaAgencia,
-									localidadeAgencia, codigoPostalAgencia, paisAgencia, profissaoAgencia,
+							agencia.criarCliente(tipoCliente, nomeAgencia,
+									numeroCartaoCidadaoAgencia, ruaAgencia,
+									localidadeAgencia, codigoPostalAgencia,
+									paisAgencia, profissaoAgencia,
 									telefoneAgencia, emailAgencia);
 
 							agenciaField.setText("");
@@ -468,7 +607,7 @@ public class Consola extends Application {
 
 				@Override
 				public void handle(ActionEvent event) {
-					start(primaryStage);
+					opcoesAgencia(primaryStage);
 				}
 			});
 
@@ -507,14 +646,17 @@ public class Consola extends Application {
 
 			Label labelCliente = new Label("Código agencia : ");
 			TextField agenciaField = new TextField();
-			agenciaField.textProperty().addListener(new ChangeListener<String>() {
-				@Override
-				public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-					if (!newValue.matches("\\d{0,9}?")) {
-						agenciaField.setText(oldValue);
-					}
-				}
-			});
+			agenciaField.textProperty().addListener(
+					new ChangeListener<String>() {
+						@Override
+						public void changed(
+								ObservableValue<? extends String> observable,
+								String oldValue, String newValue) {
+							if (!newValue.matches("\\d{0,9}?")) {
+								agenciaField.setText(oldValue);
+							}
+						}
+					});
 			HBox hbAgencia = new HBox();
 			hbAgencia.getChildren().addAll(labelCliente, agenciaField);
 			hbAgencia.setSpacing(10);
@@ -527,11 +669,14 @@ public class Consola extends Application {
 				public void handle(ActionEvent event) {
 
 					Cliente[] clientes = DatabaseOperations
-							.retrieveClientesByAgencia(Integer.parseInt(agenciaField.getText()));
+							.retrieveClientesByAgencia(Integer
+									.parseInt(agenciaField.getText()));
 
 					for (int i = 0; i < clientes.length; i++) {
-						System.out.println("Nome Agencia : " + clientes[i].getNome() + " CC : "
-								+ clientes[i].getNumeroCartaoCidadao() + " Código : " + clientes[i].getId());
+						System.out.println("Nome Agencia : "
+								+ clientes[i].getNome() + " CC : "
+								+ clientes[i].getNumeroCartaoCidadao()
+								+ " Código : " + clientes[i].getId());
 					}
 
 					agenciaField.setText("");
@@ -545,7 +690,7 @@ public class Consola extends Application {
 
 				@Override
 				public void handle(ActionEvent event) {
-					start(primaryStage);
+					opcoesAgencia(primaryStage);
 				}
 			});
 
@@ -570,6 +715,81 @@ public class Consola extends Application {
 
 	public void opcoesCliente(Stage primaryStage) {
 		try {
+			primaryStage.setTitle("Consola Banco Retalho!");
+			
+			Button btnDeposito = new Button();
+			btnDeposito.setText("Efetuar Deposito");
+			btnDeposito.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+					deposito(primaryStage);
+				}
+			});
+
+			Button btnLevantamento = new Button();
+			btnLevantamento.setText("Efetuar Levantamento");
+			btnLevantamento.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+					levantamento(primaryStage);
+				}
+			});
+
+			Button btnOpcaoTransferencia = new Button();
+			btnOpcaoTransferencia.setText("Efetuar Transferencia");
+			btnOpcaoTransferencia.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+					transferencia(primaryStage);
+				}
+			});
+			
+			Button btnListaMovs = new Button();
+			btnListaMovs.setText("Lista Movimentos Conta Corrente");
+			btnListaMovs.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+					listaMovimentos(primaryStage);
+				}
+			});
+			
+			Button btnSair = new Button();
+			btnSair.setText("Sair");
+			btnSair.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+					start(primaryStage);
+				}
+			});
+			
+			GridPane grid = new GridPane();
+			grid.setVgap(10);
+			grid.setHgap(150);
+			grid.setPadding(new Insets(5, 5, 5, 5));
+			grid.add(btnDeposito, 1, 0);
+			grid.add(btnLevantamento, 1, 2);
+			grid.add(btnOpcaoTransferencia, 1, 4);
+			grid.add(btnListaMovs, 1, 6);
+			grid.add(btnSair, 1, 8);
+
+			StackPane root = new StackPane();
+			root.getChildren().add(grid);
+			Scene scene = new Scene(root, 400, 400);
+			// scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			primaryStage.setScene(scene);
+			primaryStage.show();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}	
+	
+	public void deposito(Stage primaryStage) {
+		try {
 			// BorderPane root = new BorderPane();
 
 			primaryStage.setTitle("Agencia");
@@ -582,23 +802,28 @@ public class Consola extends Application {
 
 			Label labelCartao = new Label("Número Cartão : ");
 			TextField cartaoField = new TextField();
-			cartaoField.textProperty().addListener(new ChangeListener<String>() {
-				@Override
-				public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-					if (!newValue.matches("\\d{0,9}?")) {
-						cartaoField.setText(oldValue);
-					}
-				}
-			});
+			cartaoField.textProperty().addListener(
+					new ChangeListener<String>() {
+						@Override
+						public void changed(
+								ObservableValue<? extends String> observable,
+								String oldValue, String newValue) {
+							if (!newValue.matches("\\d{0,9}?")) {
+								cartaoField.setText(oldValue);
+							}
+						}
+					});
 			HBox hbCartao = new HBox();
 			hbCartao.getChildren().addAll(labelCartao, cartaoField);
 			hbCartao.setSpacing(10);
 
-			Label labelValor = new Label("Valor Depósito/Levantamento : ");
+			Label labelValor = new Label("Valor Depósito : ");
 			TextField valorField = new TextField();
 			valorField.textProperty().addListener(new ChangeListener<String>() {
 				@Override
-				public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				public void changed(
+						ObservableValue<? extends String> observable,
+						String oldValue, String newValue) {
 					if (!newValue.matches("\\d{0,9}?")) {
 						valorField.setText(oldValue);
 					}
@@ -616,18 +841,24 @@ public class Consola extends Application {
 				public void handle(ActionEvent event) {
 
 					Conta contaOrdemCliente = DatabaseOperations
-							.retrieveContaOrdemCliente(Integer.parseInt(clienteField.getText()));
+							.retrieveContaOrdemCliente(Integer
+									.parseInt(clienteField.getText()));
 					Cartao cartaoCliente = DatabaseOperations
-							.retrieveCartaoById(Integer.parseInt(cartaoField.getText()), true);
+							.retrieveCartaoById(
+									Integer.parseInt(cartaoField.getText()),
+									true);
 					Agencia agenciaCliente = DatabaseOperations
-							.retrieveAgenciaByClienteId(Integer.parseInt(clienteField.getText()), true);
+							.retrieveAgenciaByClienteId(
+									Integer.parseInt(clienteField.getText()),
+									true);
 
 					Cartao[] cartoesConta = contaOrdemCliente.getCartoes();
 
 					boolean isTheSame = false;
 
 					for (int i = 0; i < cartoesConta.length; i++) {
-						if (cartoesConta[i].getNumero() == cartaoCliente.getNumero()) {
+						if (cartoesConta[i].getNumero() == cartaoCliente
+								.getNumero()) {
 							isTheSame = true;
 							break;
 						}
@@ -636,8 +867,10 @@ public class Consola extends Application {
 					if (isTheSame) {
 
 						try {
-							agenciaCliente.criarMovimento(contaOrdemCliente, cartaoCliente, "Deposito",
-									Integer.parseInt(valorField.getText()), null);
+							agenciaCliente.criarMovimento(contaOrdemCliente,
+									cartaoCliente, "Deposito",
+									Integer.parseInt(valorField.getText()),
+									null);
 							Alert alert = new Alert(AlertType.INFORMATION);
 							alert.setTitle("Aviso");
 							alert.setHeaderText("Deposito efetuado com sucesso!");
@@ -647,7 +880,8 @@ public class Consola extends Application {
 							cartaoField.setText("");
 							valorField.setText("");
 
-						} catch (NumberFormatException | ContaException | CartaoException e) {
+						} catch (NumberFormatException | ContaException
+								| CartaoException e) {
 							Alert alert = new Alert(AlertType.ERROR);
 							alert.setTitle("Erro");
 							alert.setHeaderText("Ocorreu um erro ao efetuar o movimento!");
@@ -664,6 +898,88 @@ public class Consola extends Application {
 				}
 			});
 
+			Button btnSair = new Button();
+			btnSair.setText("Sair");
+			btnSair.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+					opcoesCliente(primaryStage);
+				}
+			});
+
+			HBox hbButtons = new HBox();
+			hbButtons.setSpacing(10.0);
+			hbButtons.getChildren().addAll(btnDeposito);
+
+			GridPane grid = new GridPane();
+			grid.setVgap(10);
+			grid.setHgap(5);
+			grid.setPadding(new Insets(5, 5, 5, 5));
+			grid.add(hbCliente, 1, 0);
+			grid.add(hbCartao, 1, 1);
+			grid.add(hbValor, 1, 2);
+			grid.add(hbButtons, 1, 3);
+
+
+			grid.add(btnSair, 1, 5);
+
+			StackPane root = new StackPane();
+			root.getChildren().add(grid);
+			Scene scene = new Scene(root, 400, 400);
+			// scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			primaryStage.setScene(scene);
+			primaryStage.show();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}	
+
+	public void levantamento(Stage primaryStage) {
+		try {
+			// BorderPane root = new BorderPane();
+
+			primaryStage.setTitle("Agencia");
+
+			Label labelCliente = new Label("Código Cliente : ");
+			TextField clienteField = new TextField();
+			HBox hbCliente = new HBox();
+			hbCliente.getChildren().addAll(labelCliente, clienteField);
+			hbCliente.setSpacing(10);
+
+			Label labelCartao = new Label("Número Cartão : ");
+			TextField cartaoField = new TextField();
+			cartaoField.textProperty().addListener(
+					new ChangeListener<String>() {
+						@Override
+						public void changed(
+								ObservableValue<? extends String> observable,
+								String oldValue, String newValue) {
+							if (!newValue.matches("\\d{0,9}?")) {
+								cartaoField.setText(oldValue);
+							}
+						}
+					});
+			HBox hbCartao = new HBox();
+			hbCartao.getChildren().addAll(labelCartao, cartaoField);
+			hbCartao.setSpacing(10);
+
+			Label labelValor = new Label("Valor Levantamento : ");
+			TextField valorField = new TextField();
+			valorField.textProperty().addListener(new ChangeListener<String>() {
+				@Override
+				public void changed(
+						ObservableValue<? extends String> observable,
+						String oldValue, String newValue) {
+					if (!newValue.matches("\\d{0,9}?")) {
+						valorField.setText(oldValue);
+					}
+				}
+			});
+			HBox hbValor = new HBox();
+			hbValor.getChildren().addAll(labelValor, valorField);
+			hbValor.setSpacing(10);
+
 			Button btnLevantamento = new Button();
 			btnLevantamento.setText("Efetuar Levantamento");
 			btnLevantamento.setOnAction(new EventHandler<ActionEvent>() {
@@ -672,18 +988,24 @@ public class Consola extends Application {
 				public void handle(ActionEvent event) {
 
 					Conta contaOrdemCliente = DatabaseOperations
-							.retrieveContaOrdemCliente(Integer.parseInt(clienteField.getText()));
+							.retrieveContaOrdemCliente(Integer
+									.parseInt(clienteField.getText()));
 					Cartao cartaoCliente = DatabaseOperations
-							.retrieveCartaoById(Integer.parseInt(cartaoField.getText()), true);
+							.retrieveCartaoById(
+									Integer.parseInt(cartaoField.getText()),
+									true);
 					Agencia agenciaCliente = DatabaseOperations
-							.retrieveAgenciaByClienteId(Integer.parseInt(clienteField.getText()), true);
+							.retrieveAgenciaByClienteId(
+									Integer.parseInt(clienteField.getText()),
+									true);
 
 					Cartao[] cartoesConta = contaOrdemCliente.getCartoes();
 
 					boolean isTheSame = false;
 
 					for (int i = 0; i < cartoesConta.length; i++) {
-						if (cartoesConta[i].getNumero() == cartaoCliente.getNumero()) {
+						if (cartoesConta[i].getNumero() == cartaoCliente
+								.getNumero()) {
 							isTheSame = true;
 							break;
 						}
@@ -692,8 +1014,10 @@ public class Consola extends Application {
 					if (isTheSame) {
 
 						try {
-							agenciaCliente.criarMovimento(contaOrdemCliente, cartaoCliente, "Levantamento",
-									Integer.parseInt(valorField.getText()), null);
+							agenciaCliente.criarMovimento(contaOrdemCliente,
+									cartaoCliente, "Levantamento",
+									Integer.parseInt(valorField.getText()),
+									null);
 							Alert alert = new Alert(AlertType.INFORMATION);
 							alert.setTitle("Aviso");
 							alert.setHeaderText("Levantamento efetuado com sucesso!");
@@ -727,39 +1051,91 @@ public class Consola extends Application {
 				}
 			});
 
-			Label labelContaOrigem = new Label("Conta Origem : ");
-			TextField contaOrigemField = new TextField();
-			contaOrigemField.textProperty().addListener(new ChangeListener<String>() {
+			Button btnSair = new Button();
+			btnSair.setText("Sair");
+			btnSair.setOnAction(new EventHandler<ActionEvent>() {
+
 				@Override
-				public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-					if (!newValue.matches("\\d{0,9}?")) {
-						contaOrigemField.setText(oldValue);
-					}
+				public void handle(ActionEvent event) {
+					opcoesCliente(primaryStage);
 				}
 			});
+
+			HBox hbButtons = new HBox();
+			hbButtons.setSpacing(10.0);
+			hbButtons.getChildren().addAll(btnLevantamento);
+
+			GridPane grid = new GridPane();
+			grid.setVgap(10);
+			grid.setHgap(5);
+			grid.setPadding(new Insets(5, 5, 5, 5));
+			grid.add(hbCliente, 1, 0);
+			grid.add(hbCartao, 1, 1);
+			grid.add(hbValor, 1, 2);
+			grid.add(hbButtons, 1, 3);
+
+			grid.add(btnSair, 1, 5);
+
+			StackPane root = new StackPane();
+			root.getChildren().add(grid);
+			Scene scene = new Scene(root, 400, 400);
+			// scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			primaryStage.setScene(scene);
+			primaryStage.show();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}	
+	
+	public void transferencia(Stage primaryStage) {
+		try {
+			// BorderPane root = new BorderPane();
+
+			primaryStage.setTitle("Agencia");
+
+			Label labelContaOrigem = new Label("Conta Origem : ");
+			TextField contaOrigemField = new TextField();
+			contaOrigemField.textProperty().addListener(
+					new ChangeListener<String>() {
+						@Override
+						public void changed(
+								ObservableValue<? extends String> observable,
+								String oldValue, String newValue) {
+							if (!newValue.matches("\\d{0,9}?")) {
+								contaOrigemField.setText(oldValue);
+							}
+						}
+					});
 			HBox hbContaOrigem = new HBox();
-			hbContaOrigem.getChildren().addAll(labelContaOrigem, contaOrigemField);
+			hbContaOrigem.getChildren().addAll(labelContaOrigem,
+					contaOrigemField);
 			hbContaOrigem.setSpacing(10);
 
 			Label labelContaDestino = new Label("Conta Destino : ");
 			TextField contaDestinoField = new TextField();
-			cartaoField.textProperty().addListener(new ChangeListener<String>() {
-				@Override
-				public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-					if (!newValue.matches("\\d{0,9}?")) {
-						contaDestinoField.setText(oldValue);
-					}
-				}
-			});
+			contaDestinoField.textProperty().addListener(
+					new ChangeListener<String>() {
+						@Override
+						public void changed(
+								ObservableValue<? extends String> observable,
+								String oldValue, String newValue) {
+							if (!newValue.matches("\\d{0,9}?")) {
+								contaDestinoField.setText(oldValue);
+							}
+						}
+					});
 			HBox hbContaDestino = new HBox();
-			hbContaDestino.getChildren().addAll(labelContaDestino, contaDestinoField);
+			hbContaDestino.getChildren().addAll(labelContaDestino,
+					contaDestinoField);
 			hbContaDestino.setSpacing(10);
 
 			Label labelValorT = new Label("Valor Transferência : ");
 			TextField valorTFieldT = new TextField();
-			valorField.textProperty().addListener(new ChangeListener<String>() {
+			valorTFieldT.textProperty().addListener(new ChangeListener<String>() {
 				@Override
-				public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				public void changed(
+						ObservableValue<? extends String> observable,
+						String oldValue, String newValue) {
 					if (!newValue.matches("\\d{0,9}?")) {
 						valorTFieldT.setText(oldValue);
 					}
@@ -772,26 +1148,24 @@ public class Consola extends Application {
 			Button btnTransferencia = new Button();
 			btnTransferencia.setText("Efetuar Transferência");
 			btnTransferencia.setOnAction(new EventHandler<ActionEvent>() {
-
+				
 				@Override
 				public void handle(ActionEvent event) {
+					
+					Conta contaOrigem = DatabaseOperations.retrieveContaById(Long.parseLong(contaOrigemField.getText()), true);
+					Conta contaDestino = DatabaseOperations.retrieveContaById(Long.parseLong(contaDestinoField.getText()), true);
 
-					Conta contaOrdemCliente = DatabaseOperations
-							.retrieveContaOrdemCliente(Integer.parseInt(clienteField.getText()));
+					if (contaOrigem.getTipoConta().equals(Conta.CONST_CONTA_ORDEM)						
+							|| contaDestino.getTipoConta().equals(Conta.CONST_CONTA_ORDEM)) {
 
-					if (Long.parseLong(contaOrigemField.getText()) == contaOrdemCliente.getNumero()
-							|| Long.parseLong(contaDestinoField.getText()) == contaOrdemCliente.getNumero()) {
-
-						Agencia agenciaCliente = DatabaseOperations
-								.retrieveAgenciaByClienteId(Integer.parseInt(clienteField.getText()), true);
-
-						Conta contaDestino = DatabaseOperations
-								.retrieveContaById(Long.parseLong(contaDestinoField.getText()), true);
-
+						Agencia agenciaCliente = new Agencia();
 						try {
-							agenciaCliente.criarMovimento(contaOrdemCliente, null, Movimento.CONST_TRANSFERENCIA,
-									Long.parseLong(valorTFieldT.getText()), contaDestino);
-						} catch (NumberFormatException | ContaException | CartaoException e) {
+							agenciaCliente.criarMovimento(contaOrigem,
+									null, Movimento.CONST_TRANSFERENCIA,
+									Long.parseLong(valorTFieldT.getText()),
+									contaDestino);
+						} catch (NumberFormatException | ContaException
+								| CartaoException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
@@ -806,49 +1180,27 @@ public class Consola extends Application {
 				}
 			});
 
-			Button btnListaMovimentos = new Button();
-			btnListaMovimentos.setText("Lista movimentos conta ordem");
-			btnListaMovimentos.setOnAction(new EventHandler<ActionEvent>() {
-
-				@Override
-				public void handle(ActionEvent event) {
-					
-					Conta contaOrdemCliente = DatabaseOperations
-							.retrieveContaOrdemCliente(Integer.parseInt(clienteField.getText()));
-					
-					ListaMovimentosConta(primaryStage, contaOrdemCliente.getNumero());
-				}
-			});
-
 			Button btnSair = new Button();
 			btnSair.setText("Sair");
 			btnSair.setOnAction(new EventHandler<ActionEvent>() {
 
 				@Override
 				public void handle(ActionEvent event) {
-					start(primaryStage);
+					opcoesCliente(primaryStage);
 				}
 			});
 
-			HBox hbButtons = new HBox();
-			hbButtons.setSpacing(10.0);
-			hbButtons.getChildren().addAll(btnDeposito, btnLevantamento);
 
 			GridPane grid = new GridPane();
 			grid.setVgap(10);
 			grid.setHgap(5);
 			grid.setPadding(new Insets(5, 5, 5, 5));
-			grid.add(hbCliente, 1, 0);
-			grid.add(hbCartao, 1, 1);
-			grid.add(hbValor, 1, 2);
-			grid.add(hbButtons, 1, 3);
 
-			grid.add(hbContaOrigem, 1, 5);
-			grid.add(hbContaDestino, 1, 6);
-			grid.add(hbValorT, 1, 7);
-			grid.add(btnTransferencia, 1, 8);
-			grid.add(btnListaMovimentos, 1, 10);
-			grid.add(btnSair, 1, 12);
+			grid.add(hbContaOrigem, 1, 1);
+			grid.add(hbContaDestino, 1, 3);
+			grid.add(hbValorT, 1, 5);
+			grid.add(btnTransferencia, 1, 7);
+			grid.add(btnSair, 1, 9);
 
 			StackPane root = new StackPane();
 			root.getChildren().add(grid);
@@ -859,41 +1211,112 @@ public class Consola extends Application {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
+	}	
+	
+	public void listaMovimentos(Stage primaryStage) {
+		try {
+			// BorderPane root = new BorderPane();
 
+			primaryStage.setTitle("Agencia");
+
+			Label labelCliente = new Label("Código Cliente : ");
+			TextField clienteField = new TextField();
+			HBox hbCliente = new HBox();
+			hbCliente.getChildren().addAll(labelCliente, clienteField);
+			hbCliente.setSpacing(10);
+
+			Button btnListaMovimentos = new Button();
+			btnListaMovimentos.setText("Lista movimentos conta ordem");
+			btnListaMovimentos.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+
+					Conta contaOrdemCliente = DatabaseOperations
+							.retrieveContaOrdemCliente(Integer
+									.parseInt(clienteField.getText()));
+
+					ListaMovimentosConta(primaryStage,
+							contaOrdemCliente.getNumero());
+				}
+			});		
+			
+			Button btnSair = new Button();
+			btnSair.setText("Sair");
+			btnSair.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+					opcoesCliente(primaryStage);
+				}
+			});
+
+			GridPane grid = new GridPane();
+			grid.setVgap(10);
+			grid.setHgap(5);
+			grid.setPadding(new Insets(5, 5, 5, 5));
+			grid.add(hbCliente, 1, 0);
+			grid.add(btnListaMovimentos, 1, 2);
+
+			grid.add(btnSair, 1, 5);
+
+			StackPane root = new StackPane();
+			root.getChildren().add(grid);
+			Scene scene = new Scene(root, 400, 400);
+			// scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			primaryStage.setScene(scene);
+			primaryStage.show();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}	
+	
+	
 	public void ListaMovimentosConta(Stage stage, long numeroConta) {
 		Scene scene = new Scene(new Group());
 		stage.setWidth(450);
 		stage.setHeight(550);
 
 		TableView<MovimentoConta> table = new TableView<>();
-		
-		ObservableList<MovimentoConta> data = FXCollections.observableArrayList();
-		
-		Movimento[] mov = DatabaseOperations.retrieveMovimentosConta(numeroConta, true);
 
-		for (int i=0; i< mov.length; i++) {
-			data.add(new MovimentoConta(mov[i].getData().toString(), Long.toString(mov[i].getValor())));
+		ObservableList<MovimentoConta> data = FXCollections
+				.observableArrayList();
+
+		Movimento[] mov = DatabaseOperations.retrieveMovimentosConta(
+				numeroConta, true);
+
+		for (int i = 0; i < mov.length; i++) {
+			data.add(new MovimentoConta(mov[i].getData().toString(), Long
+					.toString(mov[i].getValor())));
 		}
-		
+
 		table.setEditable(true);
 
-		TableColumn<MovimentoConta, String> firstNameCol = new TableColumn<>("Movimento");
+		TableColumn<MovimentoConta, String> firstNameCol = new TableColumn<>(
+				"Movimento");
 		firstNameCol.setMinWidth(100);
-		firstNameCol.setCellValueFactory(new PropertyValueFactory<>("firstName"));
+		firstNameCol
+				.setCellValueFactory(new PropertyValueFactory<>("firstName"));
 
-		firstNameCol.setCellFactory(TextFieldTableCell.<MovimentoConta>forTableColumn());
-		firstNameCol.setOnEditCommit((CellEditEvent<MovimentoConta, String> t) -> {
-			((MovimentoConta) t.getTableView().getItems().get(t.getTablePosition().getRow())).setFirstName(t.getNewValue());
-		});
+		firstNameCol.setCellFactory(TextFieldTableCell
+				.<MovimentoConta> forTableColumn());
+		firstNameCol
+				.setOnEditCommit((CellEditEvent<MovimentoConta, String> t) -> {
+					((MovimentoConta) t.getTableView().getItems()
+							.get(t.getTablePosition().getRow())).setFirstName(t
+							.getNewValue());
+				});
 
-		TableColumn<MovimentoConta, String> lastNameCol = new TableColumn<>("Valor");
+		TableColumn<MovimentoConta, String> lastNameCol = new TableColumn<>(
+				"Valor");
 		lastNameCol.setMinWidth(100);
 		lastNameCol.setCellValueFactory(new PropertyValueFactory<>("lastName"));
-//		lastNameCol.setCellFactory(TextFieldTableCell.<MovimentoConta>forTableColumn());
-//		lastNameCol.setOnEditCommit((CellEditEvent<MovimentoConta, String> t) -> {
-//			((MovimentoConta) t.getTableView().getItems().get(t.getTablePosition().getRow())).setLastName(t.getNewValue());
-//		});
+		// lastNameCol.setCellFactory(TextFieldTableCell.<MovimentoConta>forTableColumn());
+		// lastNameCol.setOnEditCommit((CellEditEvent<MovimentoConta, String> t)
+		// -> {
+		// ((MovimentoConta)
+		// t.getTableView().getItems().get(t.getTablePosition().getRow())).setLastName(t.getNewValue());
+		// });
 		table.setItems(data);
 		table.getColumns().addAll(firstNameCol, lastNameCol);
 
@@ -906,8 +1329,7 @@ public class Consola extends Application {
 				opcoesCliente(stage);
 			}
 		});
-		
-		
+
 		final VBox vbox = new VBox();
 		vbox.setSpacing(5);
 		vbox.setPadding(new Insets(10, 0, 0, 10));
@@ -919,6 +1341,7 @@ public class Consola extends Application {
 		stage.setScene(scene);
 		stage.show();
 	}
+	
 
 	public static class MovimentoConta {
 		private final SimpleStringProperty firstName;
@@ -945,6 +1368,7 @@ public class Consola extends Application {
 			lastName.set(fName);
 		}
 	}
+	
 
 	public static void main(String[] args) {
 		launch(args);
