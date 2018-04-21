@@ -1,18 +1,7 @@
 package application;
 
-import com.rumos.bancoretalho.db.DatabaseOperations;
-import com.rumos.bancoretalho.exceptions.CartaoException;
-import com.rumos.bancoretalho.exceptions.ClienteException;
-import com.rumos.bancoretalho.exceptions.ContaException;
-import com.rumos.bancoretalho.exceptions.EmailException;
-import com.rumos.bancoretalho.exceptions.MoradaException;
-import com.rumos.bancoretalho.exceptions.TelefoneException;
-import com.rumos.bancoretalho.impl.Agencia;
-import com.rumos.bancoretalho.impl.Banco;
-import com.rumos.bancoretalho.impl.Cartao;
-import com.rumos.bancoretalho.impl.Cliente;
-import com.rumos.bancoretalho.impl.Conta;
-import com.rumos.bancoretalho.impl.Movimento;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
@@ -28,18 +17,36 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import com.rumos.bancoretalho.db.DatabaseOperations;
+import com.rumos.bancoretalho.exceptions.CartaoException;
+import com.rumos.bancoretalho.exceptions.ClienteException;
+import com.rumos.bancoretalho.exceptions.ContaException;
+import com.rumos.bancoretalho.exceptions.EmailException;
+import com.rumos.bancoretalho.exceptions.MoradaException;
+import com.rumos.bancoretalho.exceptions.PlafondException;
+import com.rumos.bancoretalho.exceptions.TelefoneException;
+import com.rumos.bancoretalho.impl.Agencia;
+import com.rumos.bancoretalho.impl.Banco;
+import com.rumos.bancoretalho.impl.Cartao;
+import com.rumos.bancoretalho.impl.Cliente;
+import com.rumos.bancoretalho.impl.Conta;
+import com.rumos.bancoretalho.impl.Deposito;
+import com.rumos.bancoretalho.impl.Juros;
+import com.rumos.bancoretalho.impl.Levantamento;
+import com.rumos.bancoretalho.impl.Movimento;
+import com.rumos.bancoretalho.impl.Transferencia;
 
 public class Consola extends Application {
 	@Override
@@ -83,9 +90,9 @@ public class Consola extends Application {
 			grid.setVgap(10);
 			grid.setHgap(150);
 			grid.setPadding(new Insets(5, 5, 5, 5));
-			grid.add(btnopcoesBanco, 1, 0);
-			grid.add(btnopcoesAgencia, 1, 2);
-			grid.add(btnopcoesCliente, 1, 4);
+			grid.add(btnopcoesBanco, 1, 4);
+			grid.add(btnopcoesAgencia, 1, 6);
+			grid.add(btnopcoesCliente, 1, 8);
 
 			StackPane root = new StackPane();
 			root.getChildren().add(grid);
@@ -102,18 +109,28 @@ public class Consola extends Application {
 
 		try {
 			primaryStage.setTitle("Consola Banco Retalho!");
-			
+
 			Button btnCriarBanco = new Button();
 			btnCriarBanco.setText("Criar Banco");
 			btnCriarBanco.setOnAction(new EventHandler<ActionEvent>() {
 
 				@Override
 				public void handle(ActionEvent event) {
-					// System.out.println("Hello World!");
-					
+					criarBanco(primaryStage);
 				}
 			});
 			
+			Button btnListarBancos = new Button();
+			btnListarBancos.setText("Listar Bancos");
+			btnListarBancos.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+					// System.out.println("Hello World!");
+					listaBancos(primaryStage);
+				}
+			});			
+
 			Button btnCriarAgencia = new Button();
 			btnCriarAgencia.setText("Criar Agencia");
 			btnCriarAgencia.setOnAction(new EventHandler<ActionEvent>() {
@@ -135,7 +152,19 @@ public class Consola extends Application {
 					listarAgencias(primaryStage);
 				}
 			});
-			
+
+			Button btnPeriodo = new Button();
+			btnPeriodo.setText("Incrementar Periodo");
+			btnPeriodo.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+
+					incrementaPeriodo(primaryStage);
+
+				}
+			});
+
 			Button btnSair = new Button();
 			btnSair.setText("Sair");
 			btnSair.setOnAction(new EventHandler<ActionEvent>() {
@@ -146,15 +175,306 @@ public class Consola extends Application {
 				}
 			});
 
-
 			GridPane grid = new GridPane();
 			grid.setVgap(10);
 			grid.setHgap(150);
 			grid.setPadding(new Insets(5, 5, 5, 5));
 			grid.add(btnCriarBanco, 1, 0);
-			grid.add(btnCriarAgencia, 1, 2);
-			grid.add(btnListarAgencias, 1, 4);
-			grid.add(btnSair, 1, 6);
+			grid.add(btnListarBancos, 1, 2);
+			grid.add(btnCriarAgencia, 1, 4);
+			grid.add(btnListarAgencias, 1, 6);
+			grid.add(btnPeriodo, 1, 8);
+			grid.add(btnSair, 1, 10);
+
+			StackPane root = new StackPane();
+			root.getChildren().add(grid);
+			Scene scene = new Scene(root, 400, 400);
+			// scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			primaryStage.setScene(scene);
+			primaryStage.show();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public void criarBanco(Stage primaryStage) {
+
+		try {
+
+			primaryStage.setTitle("Criar Banco");
+
+			Label labelBanco = new Label("Nome do Banco : ");
+			TextField bancoField = new TextField();
+			HBox hbBanco = new HBox();
+			hbBanco.getChildren().addAll(labelBanco, bancoField);
+			hbBanco.setSpacing(10);
+
+			Label labelNIF = new Label("Número identificação fiscal : ");
+			TextField nifField = new TextField();
+			nifField.setText("0");
+			nifField.textProperty().addListener(new ChangeListener<String>() {
+				@Override
+				public void changed(
+						ObservableValue<? extends String> observable,
+						String oldValue, String newValue) {
+					if (!newValue.matches("\\d{0,9}?")) {
+						nifField.setText(oldValue);
+					}
+				}
+			});
+			HBox hbNif = new HBox();
+			hbNif.getChildren().addAll(labelNIF, nifField);
+			hbNif.setSpacing(10);
+
+			Label labelJuros = new Label("Percentagem Calculo Juros : ");
+			TextField jurosField = new TextField();
+			jurosField.setText("0");
+			jurosField.textProperty().addListener(new ChangeListener<String>() {
+				@Override
+				public void changed(
+						ObservableValue<? extends String> observable,
+						String oldValue, String newValue) {
+					if (!newValue.matches("\\d{0,9}([\\.]\\d{0,9})?")) {
+						jurosField.setText(oldValue);
+					}
+				}
+			});
+			HBox hbJuros = new HBox();
+			hbJuros.getChildren().addAll(labelJuros, jurosField);
+			hbJuros.setSpacing(10);
+
+			Button btnCriarBanco = new Button();
+			btnCriarBanco.setText("Criar Banco");
+			btnCriarBanco.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+
+					DatabaseOperations.insertBanco(bancoField.getText(),
+							Integer.parseInt(nifField.getText()),
+							Float.parseFloat(jurosField.getText()));
+
+					Alert alert = new Alert(AlertType.INFORMATION);
+					alert.setTitle("Aviso");
+					alert.setHeaderText("Banco criado!");
+					alert.showAndWait();
+
+					bancoField.setText("");
+					nifField.setText("");
+					jurosField.setText("");
+
+				}
+			});
+
+			Button btnSair = new Button();
+			btnSair.setText("Sair");
+			btnSair.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+					opcoesBanco(primaryStage);
+				}
+			});
+
+			HBox hbButtons = new HBox();
+			hbButtons.setSpacing(10.0);
+			hbButtons.getChildren().addAll(btnCriarBanco);
+
+			GridPane grid = new GridPane();
+			grid.setVgap(10);
+			grid.setHgap(5);
+			grid.setPadding(new Insets(5, 5, 5, 5));
+			grid.add(hbBanco, 1, 0);
+			grid.add(hbNif, 1, 2);
+			grid.add(hbJuros, 1, 4);
+			grid.add(hbButtons, 1, 6);
+
+			grid.add(btnSair, 1, 8);
+
+			StackPane root = new StackPane();
+			root.getChildren().add(grid);
+			Scene scene = new Scene(root, 400, 400);
+			// scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			primaryStage.setScene(scene);
+			primaryStage.show();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public void incrementaPeriodo(Stage primaryStage) {
+
+		try {
+
+			primaryStage.setTitle("Incrementar Periodo");
+
+			Label labelBanco = new Label("Nome Banco : ");
+			TextField bancoField = new TextField();
+			HBox hbBanco = new HBox();
+			hbBanco.getChildren().addAll(labelBanco, bancoField);
+			hbBanco.setSpacing(10);
+
+			Button btnIncrementa = new Button();
+			btnIncrementa.setText("Incrementar");
+			btnIncrementa.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+
+					Banco banco = DatabaseOperations
+							.retrieveBancoByNome(bancoField.getText());
+
+					int novoPeriodo = banco.getPeriodo() + 1;
+
+					Agencia[] agenciasBanco = DatabaseOperations
+							.retrieveAgenciasByBanco(banco.getId(), true);
+
+					for (int i = 0; i < agenciasBanco.length; i++) {
+
+						Cliente[] clientesAgencia = agenciasBanco[i]
+								.getClientes();
+
+						for (int j = 0; j < clientesAgencia.length; j++) {
+
+							Conta[] contasCliente = clientesAgencia[j]
+									.getContas();
+
+							for (int k = 0; k < contasCliente.length; k++) {
+
+								if (contasCliente[k].getTipoConta().equals(
+										Conta.CONST_CONTA_INVESTIMENTO)
+										|| contasCliente[k]
+												.getTipoConta()
+												.equals(Conta.CONST_CONTA_POUPANCA)
+										|| contasCliente[k]
+												.getTipoConta()
+												.equals(Conta.CONST_CONTA_PRAZO)) {
+
+									int valorJuros = (int) (contasCliente[k]
+											.getSaldo() * banco.getPercJuros());
+
+									try {
+										try {
+											agenciasBanco[i].criarMovimento(
+													contasCliente[k], null,
+													Movimento.CONST_JUROS,
+													valorJuros, null);
+										} catch (PlafondException e1) {
+											// TODO Auto-generated catch block
+											e1.printStackTrace();
+										}
+
+										Alert alert = new Alert(
+												AlertType.INFORMATION);
+										alert.setTitle("Aviso");
+										alert.setHeaderText("Depositado(s) "
+												+ valorJuros
+												+ "€ de Juros na conta "
+												+ contasCliente[k].getNumero()
+												+ "!");
+										alert.showAndWait();
+
+									} catch (ContaException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									} catch (CartaoException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+
+								}
+
+								// Atualizar o plafond das cartoes de
+								// crédito!
+
+								Cartao[] cartoesConta = contasCliente[k]
+										.getCartoes();
+
+								for (int z = 0; z < cartoesConta.length; z++) {
+
+									if (cartoesConta[z].getTipo().equals(
+											Cartao.CONST_CARTAO_CREDITO)) {
+										if (cartoesConta[z].getValorPlafond() < cartoesConta[z]
+												.getPlafond()) {
+
+											int valorAtualizarPlafond = cartoesConta[z]
+													.getPlafond()
+													- cartoesConta[z]
+															.getValorPlafond();
+											try {
+												agenciasBanco[i]
+														.criarMovimento(
+																contasCliente[k],
+																cartoesConta[z],
+																Movimento.CONST_ATUALIZACAO,
+																valorAtualizarPlafond,
+																null);
+											} catch (PlafondException e) {
+												Alert alert = new Alert(
+														AlertType.INFORMATION);
+												alert.setTitle("Aviso");
+												alert.setHeaderText("Plafond do cartao "
+														+ cartoesConta[z]
+																.getNumero()
+														+ "não atualizado!");
+												alert.showAndWait();
+											} catch (ContaException e) {
+												// TODO Auto-generated catch block
+												e.printStackTrace();
+											} catch (CartaoException e) {
+												// TODO Auto-generated catch block
+												e.printStackTrace();
+											}
+										}
+									}
+
+								}
+
+							}
+
+						}
+
+					}
+
+					banco.setPeriodo(novoPeriodo);
+
+					DatabaseOperations.updatePeriodoBanco(banco, true);
+
+					Alert alert = new Alert(AlertType.INFORMATION);
+					alert.setTitle("Aviso");
+					alert.setHeaderText("O periodo do banco foi atualizado para "
+							+ novoPeriodo + "!");
+					alert.showAndWait();
+
+					bancoField.setText("");
+
+				}
+			});
+
+			Button btnSair = new Button();
+			btnSair.setText("Sair");
+			btnSair.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+					opcoesBanco(primaryStage);
+				}
+			});
+
+			HBox hbButtons = new HBox();
+			hbButtons.setSpacing(10.0);
+			hbButtons.getChildren().addAll(btnIncrementa);
+
+			GridPane grid = new GridPane();
+			grid.setVgap(10);
+			grid.setHgap(5);
+			grid.setPadding(new Insets(5, 5, 5, 5));
+			grid.add(hbBanco, 1, 0);
+			grid.add(hbButtons, 1, 6);
+
+			grid.add(btnSair, 1, 8);
 
 			StackPane root = new StackPane();
 			root.getChildren().add(grid);
@@ -171,7 +491,7 @@ public class Consola extends Application {
 	public void opcoesAgencia(Stage primaryStage) {
 		try {
 			primaryStage.setTitle("Consola Banco Retalho!");
-			
+
 			Button btnCriarCliente = new Button();
 			btnCriarCliente.setText("Criar Cliente");
 			btnCriarCliente.setOnAction(new EventHandler<ActionEvent>() {
@@ -198,17 +518,39 @@ public class Consola extends Application {
 
 				@Override
 				public void handle(ActionEvent event) {
-					
+
+					inserirConta(primaryStage);
+
 				}
 			});
-			
+
+			Button btnListarContas = new Button();
+			btnListarContas.setText("Listar Contas Clientes");
+			btnListarContas.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+					listarContas(primaryStage);
+				}
+			});
+
 			Button btnCriarNovaCartao = new Button();
 			btnCriarNovaCartao.setText("Criar Novo Cartao");
 			btnCriarNovaCartao.setOnAction(new EventHandler<ActionEvent>() {
 
 				@Override
 				public void handle(ActionEvent event) {
-					
+					inserirCartao(primaryStage);
+				}
+			});
+
+			Button btnListarCartoes = new Button();
+			btnListarCartoes.setText("Listar Cartoes Contas");
+			btnListarCartoes.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+					listarCartoes(primaryStage);
 				}
 			});
 
@@ -221,7 +563,7 @@ public class Consola extends Application {
 					start(primaryStage);
 				}
 			});
-			
+
 			GridPane grid = new GridPane();
 			grid.setVgap(10);
 			grid.setHgap(150);
@@ -229,8 +571,10 @@ public class Consola extends Application {
 			grid.add(btnCriarCliente, 1, 0);
 			grid.add(btnListarClientes, 1, 2);
 			grid.add(btnCriarNovaConta, 1, 4);
-			grid.add(btnCriarNovaCartao, 1, 6);
-			grid.add(btnSair, 1, 8);
+			grid.add(btnListarContas, 1, 6);
+			grid.add(btnCriarNovaCartao, 1, 8);
+			grid.add(btnListarCartoes, 1, 10);
+			grid.add(btnSair, 1, 12);
 
 			StackPane root = new StackPane();
 			root.getChildren().add(grid);
@@ -380,9 +724,9 @@ public class Consola extends Application {
 			primaryStage.setTitle("Agencia");
 
 			Label labelBanco = new Label("Código banco : ");
-			TextField nomeBancoField = new TextField();
+			TextField codigoBancoField = new TextField();
 			HBox hbBanco = new HBox();
-			hbBanco.getChildren().addAll(labelBanco, nomeBancoField);
+			hbBanco.getChildren().addAll(labelBanco, codigoBancoField);
 			hbBanco.setSpacing(10);
 
 			Button btn = new Button();
@@ -392,18 +736,10 @@ public class Consola extends Application {
 				@Override
 				public void handle(ActionEvent event) {
 
-					Agencia[] agencias = DatabaseOperations
-							.retrieveAgenciasByBanco(Integer
-									.parseInt(nomeBancoField.getText()));
+					listaAgenciasBanco(primaryStage,
+							Integer.parseInt(codigoBancoField.getText()));
 
-					for (int i = 0; i < agencias.length; i++) {
-						System.out.println("Nome Agencia : "
-								+ agencias[i].getNome() + " Nif : "
-								+ agencias[i].getNif() + " Código : "
-								+ agencias[i].getNumero());
-					}
-
-					nomeBancoField.setText("");
+					codigoBancoField.setText("");
 
 				}
 			});
@@ -668,16 +1004,8 @@ public class Consola extends Application {
 				@Override
 				public void handle(ActionEvent event) {
 
-					Cliente[] clientes = DatabaseOperations
-							.retrieveClientesByAgencia(Integer
-									.parseInt(agenciaField.getText()));
-
-					for (int i = 0; i < clientes.length; i++) {
-						System.out.println("Nome Agencia : "
-								+ clientes[i].getNome() + " CC : "
-								+ clientes[i].getNumeroCartaoCidadao()
-								+ " Código : " + clientes[i].getId());
-					}
+					listaClienteAgencia(primaryStage,
+							Integer.parseInt(agenciaField.getText()));
 
 					agenciaField.setText("");
 
@@ -713,10 +1041,336 @@ public class Consola extends Application {
 		}
 	}
 
+	public void listarContas(Stage primaryStage) {
+		try {
+			primaryStage.setTitle("Listar Contas");
+
+			Label labelCliente = new Label("Código cliente : ");
+			TextField clienteField = new TextField();
+			clienteField.textProperty().addListener(
+					new ChangeListener<String>() {
+						@Override
+						public void changed(
+								ObservableValue<? extends String> observable,
+								String oldValue, String newValue) {
+							if (!newValue.matches("\\d{0,9}?")) {
+								clienteField.setText(oldValue);
+							}
+						}
+					});
+			HBox hbAgencia = new HBox();
+			hbAgencia.getChildren().addAll(labelCliente, clienteField);
+			hbAgencia.setSpacing(10);
+
+			Button btn = new Button();
+			btn.setText("Listar");
+			btn.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+
+					listaContasCliente(primaryStage,
+							Integer.parseInt(clienteField.getText()));
+
+					clienteField.setText("");
+
+				}
+			});
+
+			Button btn1 = new Button();
+			btn1.setText("Sair");
+			btn1.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+					opcoesAgencia(primaryStage);
+				}
+			});
+
+			GridPane grid = new GridPane();
+			grid.setVgap(2);
+			grid.setHgap(10);
+			grid.setPadding(new Insets(5, 5, 5, 5));
+			grid.add(hbAgencia, 0, 0);
+			grid.add(btn, 0, 1);
+			grid.add(btn1, 0, 2);
+
+			StackPane root = new StackPane();
+			root.getChildren().add(grid);
+			Scene scene = new Scene(root, 400, 400);
+			// scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			primaryStage.setScene(scene);
+			primaryStage.show();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void listarCartoes(Stage primaryStage) {
+		try {
+			primaryStage.setTitle("Listar Cartoes");
+
+			Label labelConta = new Label("Código conta : ");
+			TextField contaField = new TextField();
+			contaField.textProperty().addListener(new ChangeListener<String>() {
+				@Override
+				public void changed(
+						ObservableValue<? extends String> observable,
+						String oldValue, String newValue) {
+					if (!newValue.matches("\\d{0,9}?")) {
+						contaField.setText(oldValue);
+					}
+				}
+			});
+			HBox hbConta = new HBox();
+			hbConta.getChildren().addAll(labelConta, contaField);
+			hbConta.setSpacing(10);
+
+			Button btn = new Button();
+			btn.setText("Listar");
+			btn.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+
+					listaCartoesConta(primaryStage,
+							Integer.parseInt(contaField.getText()));
+
+					contaField.setText("");
+
+				}
+			});
+
+			Button btn1 = new Button();
+			btn1.setText("Sair");
+			btn1.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+					opcoesAgencia(primaryStage);
+				}
+			});
+
+			GridPane grid = new GridPane();
+			grid.setVgap(2);
+			grid.setHgap(10);
+			grid.setPadding(new Insets(5, 5, 5, 5));
+			grid.add(hbConta, 0, 0);
+			grid.add(btn, 0, 1);
+			grid.add(btn1, 0, 2);
+
+			StackPane root = new StackPane();
+			root.getChildren().add(grid);
+			Scene scene = new Scene(root, 400, 400);
+			// scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			primaryStage.setScene(scene);
+			primaryStage.show();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void inserirConta(Stage primaryStage) {
+
+		try {
+
+			primaryStage.setTitle("Criar Conta");
+
+			Label labelCliente = new Label("Código Cliente : ");
+			TextField clienteField = new TextField();
+			HBox hbCliente = new HBox();
+			hbCliente.getChildren().addAll(labelCliente, clienteField);
+			hbCliente.setSpacing(10);
+
+			Label labelTipo = new Label("Tipo de conta : ");
+			ObservableList<String> options = FXCollections.observableArrayList(
+					Conta.CONST_CONTA_INVESTIMENTO, Conta.CONST_CONTA_POUPANCA,
+					Conta.CONST_CONTA_PRAZO);
+			final ComboBox<String> comboBoxTipo = new ComboBox<String>(options);
+			HBox hbTipo = new HBox();
+			hbTipo.getChildren().addAll(labelTipo, comboBoxTipo);
+			hbTipo.setSpacing(10);
+
+			Label labelData = new Label("Data abertura : ");
+			TextField dataField = new TextField();
+			LocalDate date = LocalDate.now();
+			String textDate = date.format(DateTimeFormatter.BASIC_ISO_DATE);
+			dataField.setText(textDate);
+			dataField.textProperty().addListener(new ChangeListener<String>() {
+				@Override
+				public void changed(
+						ObservableValue<? extends String> observable,
+						String oldValue, String newValue) {
+					if (!newValue.matches("\\d{0,9}?")) {
+						dataField.setText(oldValue);
+					}
+				}
+			});
+			HBox hbData = new HBox();
+			hbData.getChildren().addAll(labelData, dataField);
+			hbData.setSpacing(10);
+
+			Button btnCriarConta = new Button();
+			btnCriarConta.setText("Criar Conta");
+			btnCriarConta.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+
+					DatabaseOperations.insertConta(
+							Integer.parseInt(clienteField.getText()),
+							comboBoxTipo.getValue().toString(),
+							Integer.parseInt(dataField.getText()));
+
+					Alert alert = new Alert(AlertType.INFORMATION);
+					alert.setTitle("Aviso");
+					alert.setHeaderText("Conta criada!");
+					alert.showAndWait();
+
+					clienteField.setText("");
+					dataField.setText("");
+				}
+			});
+
+			Button btnSair = new Button();
+			btnSair.setText("Sair");
+			btnSair.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+					opcoesAgencia(primaryStage);
+				}
+			});
+
+			HBox hbButtons = new HBox();
+			hbButtons.setSpacing(10.0);
+			hbButtons.getChildren().addAll(btnCriarConta);
+
+			GridPane grid = new GridPane();
+			grid.setVgap(10);
+			grid.setHgap(5);
+			grid.setPadding(new Insets(5, 5, 5, 5));
+			grid.add(hbCliente, 1, 0);
+			grid.add(hbTipo, 1, 2);
+			grid.add(hbData, 1, 4);
+			grid.add(hbButtons, 1, 6);
+
+			grid.add(btnSair, 1, 8);
+
+			StackPane root = new StackPane();
+			root.getChildren().add(grid);
+			Scene scene = new Scene(root, 400, 400);
+			// scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			primaryStage.setScene(scene);
+			primaryStage.show();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public void inserirCartao(Stage primaryStage) {
+
+		try {
+
+			primaryStage.setTitle("Criar Cartao Crédito");
+
+			Label labelConta = new Label("Código Conta : ");
+			TextField contaField = new TextField();
+			contaField.textProperty().addListener(new ChangeListener<String>() {
+				@Override
+				public void changed(
+						ObservableValue<? extends String> observable,
+						String oldValue, String newValue) {
+					if (!newValue.matches("\\d{0,9}?")) {
+						contaField.setText(oldValue);
+					}
+				}
+			});
+			HBox hbConta = new HBox();
+			hbConta.getChildren().addAll(labelConta, contaField);
+			hbConta.setSpacing(10);
+
+			Label labelPlafond = new Label("Plafond : ");
+			TextField plafondField = new TextField();
+			plafondField.textProperty().addListener(
+					new ChangeListener<String>() {
+						@Override
+						public void changed(
+								ObservableValue<? extends String> observable,
+								String oldValue, String newValue) {
+							if (!newValue.matches("\\d{0,9}?")) {
+								plafondField.setText(oldValue);
+							}
+						}
+					});
+			HBox hbPlafond = new HBox();
+			hbPlafond.getChildren().addAll(labelPlafond, plafondField);
+			hbPlafond.setSpacing(10);
+
+			Button btnCriarCartao = new Button();
+			btnCriarCartao.setText("Criar Cartao");
+			btnCriarCartao.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+
+					DatabaseOperations.insertCartao(
+							Integer.parseInt(contaField.getText()),
+							Cartao.CONST_CARTAO_CREDITO,
+							Integer.parseInt(plafondField.getText()),
+							Integer.parseInt(plafondField.getText()));
+
+					Alert alert = new Alert(AlertType.INFORMATION);
+					alert.setTitle("Aviso");
+					alert.setHeaderText("Cartao criado!");
+					alert.showAndWait();
+
+					contaField.setText("");
+					plafondField.setText("");
+				}
+			});
+
+			Button btnSair = new Button();
+			btnSair.setText("Sair");
+			btnSair.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+					opcoesAgencia(primaryStage);
+				}
+			});
+
+			HBox hbButtons = new HBox();
+			hbButtons.setSpacing(10.0);
+			hbButtons.getChildren().addAll(btnCriarCartao);
+
+			GridPane grid = new GridPane();
+			grid.setVgap(10);
+			grid.setHgap(5);
+			grid.setPadding(new Insets(5, 5, 5, 5));
+			grid.add(hbConta, 1, 0);
+			grid.add(hbPlafond, 1, 2);
+			grid.add(hbButtons, 1, 4);
+
+			grid.add(btnSair, 1, 6);
+
+			StackPane root = new StackPane();
+			root.getChildren().add(grid);
+			Scene scene = new Scene(root, 400, 400);
+			// scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			primaryStage.setScene(scene);
+			primaryStage.show();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
 	public void opcoesCliente(Stage primaryStage) {
 		try {
 			primaryStage.setTitle("Consola Banco Retalho!");
-			
+
 			Button btnDeposito = new Button();
 			btnDeposito.setText("Efetuar Deposito");
 			btnDeposito.setOnAction(new EventHandler<ActionEvent>() {
@@ -746,7 +1400,7 @@ public class Consola extends Application {
 					transferencia(primaryStage);
 				}
 			});
-			
+
 			Button btnListaMovs = new Button();
 			btnListaMovs.setText("Lista Movimentos Conta Corrente");
 			btnListaMovs.setOnAction(new EventHandler<ActionEvent>() {
@@ -757,6 +1411,16 @@ public class Consola extends Application {
 				}
 			});
 			
+			Button btnListaMovsConta = new Button();
+			btnListaMovsConta.setText("Lista Movimentos por Conta");
+			btnListaMovsConta.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+					listaMovimentosByConta(primaryStage);
+				}
+			});
+
 			Button btnSair = new Button();
 			btnSair.setText("Sair");
 			btnSair.setOnAction(new EventHandler<ActionEvent>() {
@@ -766,7 +1430,7 @@ public class Consola extends Application {
 					start(primaryStage);
 				}
 			});
-			
+
 			GridPane grid = new GridPane();
 			grid.setVgap(10);
 			grid.setHgap(150);
@@ -775,7 +1439,8 @@ public class Consola extends Application {
 			grid.add(btnLevantamento, 1, 2);
 			grid.add(btnOpcaoTransferencia, 1, 4);
 			grid.add(btnListaMovs, 1, 6);
-			grid.add(btnSair, 1, 8);
+			grid.add(btnListaMovsConta, 1, 8);
+			grid.add(btnSair, 1, 10);
 
 			StackPane root = new StackPane();
 			root.getChildren().add(grid);
@@ -786,8 +1451,8 @@ public class Consola extends Application {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}	
-	
+	}
+
 	public void deposito(Stage primaryStage) {
 		try {
 			// BorderPane root = new BorderPane();
@@ -887,6 +1552,9 @@ public class Consola extends Application {
 							alert.setHeaderText("Ocorreu um erro ao efetuar o movimento!");
 							alert.showAndWait();
 							e.printStackTrace();
+						} catch (PlafondException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
 
 					} else {
@@ -921,7 +1589,6 @@ public class Consola extends Application {
 			grid.add(hbValor, 1, 2);
 			grid.add(hbButtons, 1, 3);
 
-
 			grid.add(btnSair, 1, 5);
 
 			StackPane root = new StackPane();
@@ -933,7 +1600,7 @@ public class Consola extends Application {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}	
+	}
 
 	public void levantamento(Stage primaryStage) {
 		try {
@@ -1032,13 +1699,16 @@ public class Consola extends Application {
 							alert.setTitle("Erro");
 							alert.setHeaderText("Ocorreu um erro ao efetuar o levantamento!");
 							alert.showAndWait();
-							e.printStackTrace();
+							// e.printStackTrace();
 						} catch (ContaException e1) {
 							Alert alert = new Alert(AlertType.ERROR);
 							alert.setTitle("Erro");
 							alert.setHeaderText("O saldo é insuficiente para concretizar o movimento!");
 							alert.showAndWait();
-							e1.printStackTrace();
+							// e1.printStackTrace();
+						} catch (PlafondException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
 
 					} else {
@@ -1085,8 +1755,8 @@ public class Consola extends Application {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}	
-	
+	}
+
 	public void transferencia(Stage primaryStage) {
 		try {
 			// BorderPane root = new BorderPane();
@@ -1131,16 +1801,17 @@ public class Consola extends Application {
 
 			Label labelValorT = new Label("Valor Transferência : ");
 			TextField valorTFieldT = new TextField();
-			valorTFieldT.textProperty().addListener(new ChangeListener<String>() {
-				@Override
-				public void changed(
-						ObservableValue<? extends String> observable,
-						String oldValue, String newValue) {
-					if (!newValue.matches("\\d{0,9}?")) {
-						valorTFieldT.setText(oldValue);
-					}
-				}
-			});
+			valorTFieldT.textProperty().addListener(
+					new ChangeListener<String>() {
+						@Override
+						public void changed(
+								ObservableValue<? extends String> observable,
+								String oldValue, String newValue) {
+							if (!newValue.matches("\\d{0,9}?")) {
+								valorTFieldT.setText(oldValue);
+							}
+						}
+					});
 			HBox hbValorT = new HBox();
 			hbValorT.getChildren().addAll(labelValorT, valorTFieldT);
 			hbValorT.setSpacing(10);
@@ -1148,24 +1819,49 @@ public class Consola extends Application {
 			Button btnTransferencia = new Button();
 			btnTransferencia.setText("Efetuar Transferência");
 			btnTransferencia.setOnAction(new EventHandler<ActionEvent>() {
-				
+
 				@Override
 				public void handle(ActionEvent event) {
-					
-					Conta contaOrigem = DatabaseOperations.retrieveContaById(Long.parseLong(contaOrigemField.getText()), true);
-					Conta contaDestino = DatabaseOperations.retrieveContaById(Long.parseLong(contaDestinoField.getText()), true);
 
-					if (contaOrigem.getTipoConta().equals(Conta.CONST_CONTA_ORDEM)						
-							|| contaDestino.getTipoConta().equals(Conta.CONST_CONTA_ORDEM)) {
+					Conta contaOrigem = DatabaseOperations.retrieveContaById(
+							Long.parseLong(contaOrigemField.getText()), true);
+					Conta contaDestino = DatabaseOperations.retrieveContaById(
+							Long.parseLong(contaDestinoField.getText()), true);
+
+					if (contaOrigem.getTipoConta().equals(
+							Conta.CONST_CONTA_ORDEM)
+							|| contaDestino.getTipoConta().equals(
+									Conta.CONST_CONTA_ORDEM)) {
 
 						Agencia agenciaCliente = new Agencia();
+
 						try {
-							agenciaCliente.criarMovimento(contaOrigem,
-									null, Movimento.CONST_TRANSFERENCIA,
+							agenciaCliente.criarMovimento(contaOrigem, null,
+									Movimento.CONST_TRANSFERENCIA,
 									Long.parseLong(valorTFieldT.getText()),
 									contaDestino);
-						} catch (NumberFormatException | ContaException
-								| CartaoException e) {
+
+							Alert alert = new Alert(AlertType.CONFIRMATION);
+							alert.setTitle("Erro");
+							alert.setHeaderText("Transferencia efetuada!");
+							alert.showAndWait();
+
+							contaOrigemField.setText("");
+							contaDestinoField.setText("");
+							valorTFieldT.setText("");
+
+						} catch (NumberFormatException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (ContaException e) {
+							Alert alert = new Alert(AlertType.ERROR);
+							alert.setTitle("Erro");
+							alert.setHeaderText("O saldo não é suficiente para processar a transferencia!");
+							alert.showAndWait();
+						} catch (CartaoException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (PlafondException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
@@ -1190,7 +1886,6 @@ public class Consola extends Application {
 				}
 			});
 
-
 			GridPane grid = new GridPane();
 			grid.setVgap(10);
 			grid.setHgap(5);
@@ -1211,8 +1906,8 @@ public class Consola extends Application {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}	
-	
+	}
+
 	public void listaMovimentos(Stage primaryStage) {
 		try {
 			// BorderPane root = new BorderPane();
@@ -1236,11 +1931,11 @@ public class Consola extends Application {
 							.retrieveContaOrdemCliente(Integer
 									.parseInt(clienteField.getText()));
 
-					ListaMovimentosConta(primaryStage,
+					listaMovimentosConta(primaryStage,
 							contaOrdemCliente.getNumero());
 				}
-			});		
-			
+			});
+
 			Button btnSair = new Button();
 			btnSair.setText("Sair");
 			btnSair.setOnAction(new EventHandler<ActionEvent>() {
@@ -1269,56 +1964,116 @@ public class Consola extends Application {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void listaMovimentosByConta(Stage primaryStage) {
+		try {
+			// BorderPane root = new BorderPane();
+
+			primaryStage.setTitle("Agencia");
+
+			Label labelConta = new Label("Código Conta : ");
+			TextField contaField = new TextField();
+			HBox hbConta = new HBox();
+			hbConta.getChildren().addAll(labelConta, contaField);
+			hbConta.setSpacing(10);
+
+			Button btnListaMovimentos = new Button();
+			btnListaMovimentos.setText("Lista movimentos conta");
+			btnListaMovimentos.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+					listaMovimentosConta(primaryStage,
+							Integer.parseInt(contaField.getText()));
+				}
+			});
+
+			Button btnSair = new Button();
+			btnSair.setText("Sair");
+			btnSair.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+					opcoesCliente(primaryStage);
+				}
+			});
+
+			GridPane grid = new GridPane();
+			grid.setVgap(10);
+			grid.setHgap(5);
+			grid.setPadding(new Insets(5, 5, 5, 5));
+			grid.add(hbConta, 1, 0);
+			grid.add(btnListaMovimentos, 1, 2);
+
+			grid.add(btnSair, 1, 5);
+
+			StackPane root = new StackPane();
+			root.getChildren().add(grid);
+			Scene scene = new Scene(root, 400, 400);
+			// scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			primaryStage.setScene(scene);
+			primaryStage.show();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}	
 	
-	
-	public void ListaMovimentosConta(Stage stage, long numeroConta) {
+
+	@SuppressWarnings("unchecked")
+	public void listaMovimentosConta(Stage stage, long numeroConta) {
 		Scene scene = new Scene(new Group());
 		stage.setWidth(450);
 		stage.setHeight(550);
 
-		TableView<MovimentoConta> table = new TableView<>();
+		TableView<movimentoConta> table = new TableView<>();
 
-		ObservableList<MovimentoConta> data = FXCollections
+		ObservableList<movimentoConta> data = FXCollections
 				.observableArrayList();
 
 		Movimento[] mov = DatabaseOperations.retrieveMovimentosConta(
 				numeroConta, true);
 
 		for (int i = 0; i < mov.length; i++) {
-			data.add(new MovimentoConta(mov[i].getData().toString(), Long
-					.toString(mov[i].getValor())));
+
+			String tipoConta = "";
+
+			if (mov[i] instanceof Deposito) {
+				tipoConta = Movimento.CONST_DEPOSITO;
+			} else if (mov[i] instanceof Levantamento) {
+				tipoConta = Movimento.CONST_LEVANTAMENTO;
+			} else if (mov[i] instanceof Juros) {
+				tipoConta = Movimento.CONST_JUROS;
+			} else if (mov[i] instanceof Transferencia) {
+				tipoConta = Movimento.CONST_TRANSFERENCIA;
+			}
+
+			data.add(new movimentoConta(mov[i].getData().toString(), Long
+					.toString(mov[i].getValor()), tipoConta));
 		}
 
 		table.setEditable(true);
 
-		TableColumn<MovimentoConta, String> firstNameCol = new TableColumn<>(
+		TableColumn<movimentoConta, String> firstNameCol = new TableColumn<>(
 				"Movimento");
 		firstNameCol.setMinWidth(100);
 		firstNameCol
 				.setCellValueFactory(new PropertyValueFactory<>("firstName"));
 
-		firstNameCol.setCellFactory(TextFieldTableCell
-				.<MovimentoConta> forTableColumn());
-		firstNameCol
-				.setOnEditCommit((CellEditEvent<MovimentoConta, String> t) -> {
-					((MovimentoConta) t.getTableView().getItems()
-							.get(t.getTablePosition().getRow())).setFirstName(t
-							.getNewValue());
-				});
+		TableColumn<movimentoConta, String> tipoContaCol = new TableColumn<>(
+				"Tipo");
+		tipoContaCol.setMinWidth(100);
+		tipoContaCol
+				.setCellValueFactory(new PropertyValueFactory<>("tipoConta"));
 
-		TableColumn<MovimentoConta, String> lastNameCol = new TableColumn<>(
+		TableColumn<movimentoConta, String> lastNameCol = new TableColumn<>(
 				"Valor");
 		lastNameCol.setMinWidth(100);
 		lastNameCol.setCellValueFactory(new PropertyValueFactory<>("lastName"));
-		// lastNameCol.setCellFactory(TextFieldTableCell.<MovimentoConta>forTableColumn());
-		// lastNameCol.setOnEditCommit((CellEditEvent<MovimentoConta, String> t)
-		// -> {
-		// ((MovimentoConta)
-		// t.getTableView().getItems().get(t.getTablePosition().getRow())).setLastName(t.getNewValue());
-		// });
+
 		table.setItems(data);
-		table.getColumns().addAll(firstNameCol, lastNameCol);
+
+		table.getColumns().addAll(firstNameCol, tipoContaCol, lastNameCol);
 
 		Button btnSair = new Button();
 		btnSair.setText("Sair");
@@ -1341,13 +2096,398 @@ public class Consola extends Application {
 		stage.setScene(scene);
 		stage.show();
 	}
-	
 
-	public static class MovimentoConta {
+	@SuppressWarnings("unchecked")
+	public void listaAgenciasBanco(Stage stage, int codigoBanco) {
+
+		Scene scene = new Scene(new Group());
+		stage.setWidth(450);
+		stage.setHeight(550);
+
+		TableView<agenciasBanco> table = new TableView<>();
+
+		ObservableList<agenciasBanco> data = FXCollections
+				.observableArrayList();
+
+		Agencia[] agencias = DatabaseOperations
+				.retrieveAgenciasByBanco(codigoBanco, true);
+
+		for (int i = 0; i < agencias.length; i++) {
+			data.add(new agenciasBanco(agencias[i].getNome(), String
+					.valueOf(agencias[i].getNumero())));
+		}
+
+		table.setEditable(true);
+
+		TableColumn<agenciasBanco, String> firstNameCol = new TableColumn<>(
+				"Nome Agencia");
+		firstNameCol.setMinWidth(100);
+		firstNameCol
+				.setCellValueFactory(new PropertyValueFactory<>("firstName"));
+
+		TableColumn<agenciasBanco, String> lastNameCol = new TableColumn<>(
+				"Numero Agencia");
+		lastNameCol.setMinWidth(100);
+		lastNameCol.setCellValueFactory(new PropertyValueFactory<>("lastName"));
+
+		table.setItems(data);
+		table.getColumns().addAll(firstNameCol, lastNameCol);
+
+		Button btnSair = new Button();
+		btnSair.setText("Sair");
+		btnSair.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				opcoesBanco(stage);
+			}
+		});
+
+		final VBox vbox = new VBox();
+		vbox.setSpacing(5);
+		vbox.setPadding(new Insets(10, 0, 0, 10));
+		vbox.getChildren().addAll(table);
+		vbox.getChildren().addAll(btnSair);
+
+		((Group) scene.getRoot()).getChildren().addAll(vbox);
+
+		stage.setScene(scene);
+		stage.show();
+
+	}
+
+	@SuppressWarnings("unchecked")
+	public void listaClienteAgencia(Stage stage, int codigoAgencia) {
+
+		Scene scene = new Scene(new Group());
+		stage.setWidth(450);
+		stage.setHeight(550);
+
+		TableView<clientesAgencia> table = new TableView<>();
+
+		ObservableList<clientesAgencia> data = FXCollections
+				.observableArrayList();
+
+		Cliente[] clientes = DatabaseOperations.retrieveClientesByAgencia(
+				codigoAgencia, true);
+
+		for (int i = 0; i < clientes.length; i++) {
+			data.add(new clientesAgencia(clientes[i].getNome(), String
+					.valueOf(clientes[i].getNumeroCartaoCidadao()), String
+					.valueOf(clientes[i].getId())));
+		}
+
+		table.setEditable(true);
+
+		TableColumn<clientesAgencia, String> firstNameCol = new TableColumn<>(
+				"Nome Cliente");
+		firstNameCol.setMinWidth(100);
+		firstNameCol
+				.setCellValueFactory(new PropertyValueFactory<>("firstName"));
+
+		TableColumn<clientesAgencia, String> lastNameCol = new TableColumn<>(
+				"Cartao Cidadão");
+		lastNameCol.setMinWidth(100);
+		lastNameCol.setCellValueFactory(new PropertyValueFactory<>("lastName"));
+
+		TableColumn<clientesAgencia, String> numInternoCol = new TableColumn<>(
+				"Id Cidadão");
+		numInternoCol.setMinWidth(100);
+		numInternoCol.setCellValueFactory(new PropertyValueFactory<>(
+				"numInterno"));
+
+		table.setItems(data);
+		table.getColumns().addAll(firstNameCol, lastNameCol, numInternoCol);
+
+		Button btnSair = new Button();
+		btnSair.setText("Sair");
+		btnSair.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				opcoesAgencia(stage);
+			}
+		});
+
+		final VBox vbox = new VBox();
+		vbox.setSpacing(5);
+		vbox.setPadding(new Insets(10, 0, 0, 10));
+		vbox.getChildren().addAll(table);
+		vbox.getChildren().addAll(btnSair);
+
+		((Group) scene.getRoot()).getChildren().addAll(vbox);
+
+		stage.setScene(scene);
+		stage.show();
+
+	}
+
+	@SuppressWarnings("unchecked")
+	public void listaContasCliente(Stage stage, int numeroCliente) {
+		Scene scene = new Scene(new Group());
+		stage.setWidth(450);
+		stage.setHeight(550);
+
+		TableView<contaCliente> table = new TableView<>();
+
+		ObservableList<contaCliente> data = FXCollections.observableArrayList();
+
+		Conta[] contas = DatabaseOperations.retrieveContasCliente(
+				numeroCliente, true);
+
+		for (int i = 0; i < contas.length; i++) {
+
+			data.add(new contaCliente(Long.toString(contas[i].getNumero()),
+					contas[i].getTipoConta(), Long.toString(contas[i]
+							.getSaldo())));
+		}
+
+		table.setEditable(true);
+
+		TableColumn<contaCliente, String> numContaCol = new TableColumn<>(
+				"Conta");
+		numContaCol.setMinWidth(100);
+		numContaCol.setCellValueFactory(new PropertyValueFactory<>("numConta"));
+
+		TableColumn<contaCliente, String> tipoContaCol = new TableColumn<>(
+				"Tipo");
+		tipoContaCol.setMinWidth(100);
+		tipoContaCol
+				.setCellValueFactory(new PropertyValueFactory<>("tipoConta"));
+
+		TableColumn<contaCliente, String> valorContaCol = new TableColumn<>(
+				"Valor");
+		valorContaCol.setMinWidth(100);
+		valorContaCol.setCellValueFactory(new PropertyValueFactory<>(
+				"valorConta"));
+
+		table.setItems(data);
+
+		table.getColumns().addAll(numContaCol, tipoContaCol, valorContaCol);
+
+		Button btnSair = new Button();
+		btnSair.setText("Sair");
+		btnSair.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				opcoesAgencia(stage);
+			}
+		});
+
+		final VBox vbox = new VBox();
+		vbox.setSpacing(5);
+		vbox.setPadding(new Insets(10, 0, 0, 10));
+		vbox.getChildren().addAll(table);
+		vbox.getChildren().addAll(btnSair);
+
+		((Group) scene.getRoot()).getChildren().addAll(vbox);
+
+		stage.setScene(scene);
+		stage.show();
+	}
+
+	@SuppressWarnings("unchecked")
+	public void listaCartoesConta(Stage stage, int numeroConta) {
+		Scene scene = new Scene(new Group());
+		stage.setWidth(450);
+		stage.setHeight(550);
+
+		TableView<cartaoConta> table = new TableView<>();
+
+		ObservableList<cartaoConta> data = FXCollections.observableArrayList();
+
+		Cartao[] cartoes = DatabaseOperations.retrieveCartoesByConta(
+				numeroConta, true);
+
+		for (int i = 0; i < cartoes.length; i++) {
+
+			data.add(new cartaoConta(Long.toString(cartoes[i].getNumero()),
+					cartoes[i].getTipo(),
+					Long.toString(cartoes[i].getPlafond()), Integer
+							.toString(cartoes[i].getValorPlafond())));
+		}
+
+		table.setEditable(true);
+
+		TableColumn<cartaoConta, String> numCartaoCol = new TableColumn<>(
+				"Cartao");
+		numCartaoCol.setMinWidth(100);
+		numCartaoCol
+				.setCellValueFactory(new PropertyValueFactory<>("numCartao"));
+
+		TableColumn<cartaoConta, String> tipoCartaoCol = new TableColumn<>(
+				"Tipo");
+		tipoCartaoCol.setMinWidth(100);
+		tipoCartaoCol.setCellValueFactory(new PropertyValueFactory<>(
+				"tipoCartao"));
+
+		TableColumn<cartaoConta, String> valorCartaoCol = new TableColumn<>(
+				"Plafond");
+		valorCartaoCol.setMinWidth(100);
+		valorCartaoCol.setCellValueFactory(new PropertyValueFactory<>(
+				"valorPlafond"));
+
+		TableColumn<cartaoConta, String> valorAtualCartaoCol = new TableColumn<>(
+				"Plafond Atual");
+		valorAtualCartaoCol.setMinWidth(100);
+		valorAtualCartaoCol.setCellValueFactory(new PropertyValueFactory<>(
+				"valorAtual"));
+
+		table.setItems(data);
+
+		table.getColumns().addAll(numCartaoCol, tipoCartaoCol, valorCartaoCol,
+				valorAtualCartaoCol);
+
+		Button btnSair = new Button();
+		btnSair.setText("Sair");
+		btnSair.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				opcoesAgencia(stage);
+			}
+		});
+
+		final VBox vbox = new VBox();
+		vbox.setSpacing(5);
+		vbox.setPadding(new Insets(10, 0, 0, 10));
+		vbox.getChildren().addAll(table);
+		vbox.getChildren().addAll(btnSair);
+
+		((Group) scene.getRoot()).getChildren().addAll(vbox);
+
+		stage.setScene(scene);
+		stage.show();
+	}
+
+	@SuppressWarnings("unchecked")
+	public void listaBancos(Stage stage) {
+		Scene scene = new Scene(new Group());
+		stage.setWidth(450);
+		stage.setHeight(550);
+
+		TableView<bancos> table = new TableView<>();
+
+		ObservableList<bancos> data = FXCollections.observableArrayList();
+
+		Banco[] bancos = DatabaseOperations.retrieveBancos();
+
+		for (int i = 0; i < bancos.length; i++) {
+			data.add(new bancos(Long.toString(bancos[i].getId()),
+					bancos[i].getNome()));
+		}
+
+		table.setEditable(true);
+
+		TableColumn<bancos, String> idBancoCol = new TableColumn<>(
+				"Id Conta");
+		idBancoCol.setMinWidth(100);
+		idBancoCol.setCellValueFactory(new PropertyValueFactory<>("idBanco"));
+
+		TableColumn<bancos, String> nomeBancoCol = new TableColumn<>(
+				"Nome Conta");
+		nomeBancoCol.setMinWidth(100);
+		nomeBancoCol
+				.setCellValueFactory(new PropertyValueFactory<>("nomeBanco"));
+
+		table.setItems(data);
+
+		table.getColumns().addAll(idBancoCol, nomeBancoCol);
+
+		Button btnSair = new Button();
+		btnSair.setText("Sair");
+		btnSair.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				opcoesBanco(stage);
+			}
+		});
+
+		final VBox vbox = new VBox();
+		vbox.setSpacing(5);
+		vbox.setPadding(new Insets(10, 0, 0, 10));
+		vbox.getChildren().addAll(table);
+		vbox.getChildren().addAll(btnSair);
+
+		((Group) scene.getRoot()).getChildren().addAll(vbox);
+
+		stage.setScene(scene);
+		stage.show();
+	}
+	
+	
+	public static class movimentoConta {
+
+		private final SimpleStringProperty firstName;
+		private final SimpleStringProperty tipoConta;
+		private final SimpleStringProperty lastName;
+
+		private movimentoConta(String fName, String lName, String tConta) {
+			this.firstName = new SimpleStringProperty(fName);
+			this.tipoConta = new SimpleStringProperty(tConta);
+			this.lastName = new SimpleStringProperty(lName);
+		}
+
+		public String getFirstName() {
+			return firstName.get();
+		}
+
+		public void setFirstName(String fName) {
+			firstName.set(fName);
+		}
+
+		public String getTipoConta() {
+			return tipoConta.get();
+		}
+
+		public void setTipoConta(String tConta) {
+			tipoConta.set(tConta);
+		}
+
+		public String getLastName() {
+			return lastName.get();
+		}
+
+		public void setLastName(String fName) {
+			lastName.set(fName);
+		}
+	}
+
+	public static class bancos {
+
+		private final SimpleStringProperty idBanco;
+		private final SimpleStringProperty nomeBanco;
+
+		private bancos(String id, String nome) {
+			this.idBanco = new SimpleStringProperty(id);
+			this.nomeBanco = new SimpleStringProperty(nome);
+		}
+
+		public String getIdBanco() {
+			return idBanco.get();
+		}
+
+		public void setIdBanco(String id) {
+			idBanco.set(id);
+		}
+
+		public String getNomeBanco() {
+			return nomeBanco.get();
+		}
+
+		public void setNomeBanco(String nome) {
+			nomeBanco.set(nome);
+		}
+	}	
+	
+	public static class agenciasBanco {
+
 		private final SimpleStringProperty firstName;
 		private final SimpleStringProperty lastName;
 
-		private MovimentoConta(String fName, String lName) {
+		private agenciasBanco(String fName, String lName) {
 			this.firstName = new SimpleStringProperty(fName);
 			this.lastName = new SimpleStringProperty(lName);
 		}
@@ -1368,7 +2508,128 @@ public class Consola extends Application {
 			lastName.set(fName);
 		}
 	}
-	
+
+	public static class clientesAgencia {
+
+		private final SimpleStringProperty firstName;
+		private final SimpleStringProperty lastName;
+		private final SimpleStringProperty numInterno;
+
+		private clientesAgencia(String fName, String lName, String numI) {
+			this.firstName = new SimpleStringProperty(fName);
+			this.lastName = new SimpleStringProperty(lName);
+			this.numInterno = new SimpleStringProperty(numI);
+		}
+
+		public String getFirstName() {
+			return firstName.get();
+		}
+
+		public void setFirstName(String fName) {
+			firstName.set(fName);
+		}
+
+		public String getLastName() {
+			return lastName.get();
+		}
+
+		public void setLastName(String lName) {
+			lastName.set(lName);
+		}
+
+		public String getNumInterno() {
+			return numInterno.get();
+		}
+
+		public void setNumInterno(String numI) {
+			numInterno.set(numI);
+		}
+	}
+
+	public static class contaCliente {
+
+		private final SimpleStringProperty numConta;
+		private final SimpleStringProperty tipoConta;
+		private final SimpleStringProperty valorConta;
+
+		private contaCliente(String nConta, String tConta, String vConta) {
+			this.numConta = new SimpleStringProperty(nConta);
+			this.tipoConta = new SimpleStringProperty(tConta);
+			this.valorConta = new SimpleStringProperty(vConta);
+		}
+
+		public String getNumConta() {
+			return numConta.get();
+		}
+
+		public void setNumConta(String fName) {
+			numConta.set(fName);
+		}
+
+		public String getTipoConta() {
+			return tipoConta.get();
+		}
+
+		public void setTipoConta(String tConta) {
+			tipoConta.set(tConta);
+		}
+
+		public String getValorConta() {
+			return valorConta.get();
+		}
+
+		public void setValorConta(String vConta) {
+			valorConta.set(vConta);
+		}
+	}
+
+	public static class cartaoConta {
+
+		private final SimpleStringProperty numCartao;
+		private final SimpleStringProperty tipoCartao;
+		private final SimpleStringProperty valorPlafond;
+		private final SimpleStringProperty valorAtual;
+
+		private cartaoConta(String nCartao, String tCartao, String vPlafond,
+				String vAtual) {
+			this.numCartao = new SimpleStringProperty(nCartao);
+			this.tipoCartao = new SimpleStringProperty(tCartao);
+			this.valorPlafond = new SimpleStringProperty(vPlafond);
+			this.valorAtual = new SimpleStringProperty(vAtual);
+		}
+
+		public String getNumCartao() {
+			return numCartao.get();
+		}
+
+		public void setNumCartao(String nCartao) {
+			numCartao.set(nCartao);
+		}
+
+		public String getTipoCartao() {
+			return tipoCartao.get();
+		}
+
+		public void setTipoConta(String tCartao) {
+			tipoCartao.set(tCartao);
+		}
+
+		public String getValorPlafond() {
+			return valorPlafond.get();
+		}
+
+		public void setValorPlafond(String vConta) {
+			valorPlafond.set(vConta);
+		}
+
+		public String getValorAtual() {
+			return valorAtual.get();
+		}
+
+		public void setValorAtual(String vConta) {
+			valorAtual.set(vConta);
+		}
+	}
 
 	public static void main(String[] args) {
 		launch(args);
