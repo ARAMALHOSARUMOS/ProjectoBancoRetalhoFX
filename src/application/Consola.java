@@ -119,7 +119,7 @@ public class Consola extends Application {
 					criarBanco(primaryStage);
 				}
 			});
-			
+
 			Button btnListarBancos = new Button();
 			btnListarBancos.setText("Listar Bancos");
 			btnListarBancos.setOnAction(new EventHandler<ActionEvent>() {
@@ -129,7 +129,7 @@ public class Consola extends Application {
 					// System.out.println("Hello World!");
 					listaBancos(primaryStage);
 				}
-			});			
+			});
 
 			Button btnCriarAgencia = new Button();
 			btnCriarAgencia.setText("Criar Agencia");
@@ -421,10 +421,12 @@ public class Consola extends Application {
 														+ "não atualizado!");
 												alert.showAndWait();
 											} catch (ContaException e) {
-												// TODO Auto-generated catch block
+												// TODO Auto-generated catch
+												// block
 												e.printStackTrace();
 											} catch (CartaoException e) {
-												// TODO Auto-generated catch block
+												// TODO Auto-generated catch
+												// block
 												e.printStackTrace();
 											}
 										}
@@ -1410,7 +1412,7 @@ public class Consola extends Application {
 					listaMovimentos(primaryStage);
 				}
 			});
-			
+
 			Button btnListaMovsConta = new Button();
 			btnListaMovsConta.setText("Lista Movimentos por Conta");
 			btnListaMovsConta.setOnAction(new EventHandler<ActionEvent>() {
@@ -1916,6 +1918,17 @@ public class Consola extends Application {
 
 			Label labelCliente = new Label("Código Cliente : ");
 			TextField clienteField = new TextField();
+			clienteField.textProperty().addListener(
+					new ChangeListener<String>() {
+						@Override
+						public void changed(
+								ObservableValue<? extends String> observable,
+								String oldValue, String newValue) {
+							if (!newValue.matches("\\d{0,9}?")) {
+								clienteField.setText(oldValue);
+							}
+						}
+					});
 			HBox hbCliente = new HBox();
 			hbCliente.getChildren().addAll(labelCliente, clienteField);
 			hbCliente.setSpacing(10);
@@ -1927,12 +1940,20 @@ public class Consola extends Application {
 				@Override
 				public void handle(ActionEvent event) {
 
-					Conta contaOrdemCliente = DatabaseOperations
-							.retrieveContaOrdemCliente(Integer
-									.parseInt(clienteField.getText()));
+					if (clienteField.getText().toString().equals("")) {
+						Alert alert = new Alert(AlertType.ERROR);
+						alert.setTitle("Erro");
+						alert.setHeaderText("Introduza um código válido!");
+						alert.showAndWait();
+					} else {
 
-					listaMovimentosConta(primaryStage,
-							contaOrdemCliente.getNumero());
+						Conta contaOrdemCliente = DatabaseOperations
+								.retrieveContaOrdemCliente(Integer
+										.parseInt(clienteField.getText()));
+
+						listaMovimentosConta(primaryStage,
+								contaOrdemCliente.getNumero());
+					}
 				}
 			});
 
@@ -1965,7 +1986,7 @@ public class Consola extends Application {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void listaMovimentosByConta(Stage primaryStage) {
 		try {
 			// BorderPane root = new BorderPane();
@@ -1974,6 +1995,17 @@ public class Consola extends Application {
 
 			Label labelConta = new Label("Código Conta : ");
 			TextField contaField = new TextField();
+			contaField.textProperty().addListener(
+					new ChangeListener<String>() {
+						@Override
+						public void changed(
+								ObservableValue<? extends String> observable,
+								String oldValue, String newValue) {
+							if (!newValue.matches("\\d{0,9}?")) {
+								contaField.setText(oldValue);
+							}
+						}
+					});
 			HBox hbConta = new HBox();
 			hbConta.getChildren().addAll(labelConta, contaField);
 			hbConta.setSpacing(10);
@@ -1984,8 +2016,16 @@ public class Consola extends Application {
 
 				@Override
 				public void handle(ActionEvent event) {
-					listaMovimentosConta(primaryStage,
-							Integer.parseInt(contaField.getText()));
+
+					if (contaField.getText().toString().equals("")) {
+						Alert alert = new Alert(AlertType.ERROR);
+						alert.setTitle("Erro");
+						alert.setHeaderText("Introduza um código válido!");
+						alert.showAndWait();
+					} else {
+						listaMovimentosConta(primaryStage,
+								Integer.parseInt(contaField.getText()));
+					}
 				}
 			});
 
@@ -2017,8 +2057,7 @@ public class Consola extends Application {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}	
-	
+	}
 
 	@SuppressWarnings("unchecked")
 	public void listaMovimentosConta(Stage stage, long numeroConta) {
@@ -2109,8 +2148,8 @@ public class Consola extends Application {
 		ObservableList<agenciasBanco> data = FXCollections
 				.observableArrayList();
 
-		Agencia[] agencias = DatabaseOperations
-				.retrieveAgenciasByBanco(codigoBanco, true);
+		Agencia[] agencias = DatabaseOperations.retrieveAgenciasByBanco(
+				codigoBanco, true);
 
 		for (int i = 0; i < agencias.length; i++) {
 			data.add(new agenciasBanco(agencias[i].getNome(), String
@@ -2374,14 +2413,13 @@ public class Consola extends Application {
 		Banco[] bancos = DatabaseOperations.retrieveBancos();
 
 		for (int i = 0; i < bancos.length; i++) {
-			data.add(new bancos(Long.toString(bancos[i].getId()),
-					bancos[i].getNome()));
+			data.add(new bancos(Long.toString(bancos[i].getId()), bancos[i]
+					.getNome()));
 		}
 
 		table.setEditable(true);
 
-		TableColumn<bancos, String> idBancoCol = new TableColumn<>(
-				"Id Conta");
+		TableColumn<bancos, String> idBancoCol = new TableColumn<>("Id Conta");
 		idBancoCol.setMinWidth(100);
 		idBancoCol.setCellValueFactory(new PropertyValueFactory<>("idBanco"));
 
@@ -2416,8 +2454,7 @@ public class Consola extends Application {
 		stage.setScene(scene);
 		stage.show();
 	}
-	
-	
+
 	public static class movimentoConta {
 
 		private final SimpleStringProperty firstName;
@@ -2480,8 +2517,8 @@ public class Consola extends Application {
 		public void setNomeBanco(String nome) {
 			nomeBanco.set(nome);
 		}
-	}	
-	
+	}
+
 	public static class agenciasBanco {
 
 		private final SimpleStringProperty firstName;
